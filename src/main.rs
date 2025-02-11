@@ -6,20 +6,25 @@
 //!  if the agent isn't waiting it ticks the agent's AI
 use bevy::{math::vec2, prelude::*};
 
-mod ai_system;
-pub use ai_system::ai_system;
 mod entities_in_area_system;
 pub use entities_in_area_system::entities_in_area_system;
+use ethnolib::sandbox::{
+    actions::{use_object_system, PosibleActionsRequest, PosibleActionsResponce, UseRequest}, change_request::change_request_system, world::{Energy, Hp, Item, Size, Type}, Location
+};
 
-const BRICK_COLOR: Color = Color::srgb(0.5, 0.5, 1.0);
-const BRICK_SIZE: Vec2 = Vec2::new(100., 30.);
+mod pawn_spawn;
+use pawn_spawn::pawn_spawn;
+
+const BRICK_SIZE: f32 = 30.0 ;
 
 type Coord = (i32, i32);
+
 #[derive(Event, Debug)]
 pub struct EntitiesInAreaReponse {
     pub agent_id: Entity,
     pub entitie_ids: Vec<Entity>,
 }
+
 #[derive(Event, Debug)]
 pub struct EntitiesInAreaRequest {
     pub agent_id: Entity,
@@ -27,39 +32,53 @@ pub struct EntitiesInAreaRequest {
     pub size: Coord,
 }
 
+#[derive(Debug, Resource)]
+pub struct Salt(u64);
+
+pub fn salt_system(mut salt: ResMut<Salt>) {
+    salt.0 += 1;
+    println!("----salt {}", salt.0);
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_event::<EntitiesInAreaReponse>()
-        .add_event::<EntitiesInAreaRequest>()
+        .insert_resource(Salt(0))
         .add_systems(Startup, setup)
-        .add_systems(Update, ai_system)
-        .add_systems(Update, entities_in_area_system)
+        .add_event::<UseRequest>()
+        .add_event::<PosibleActionsRequest>()
+        .add_event::<PosibleActionsResponce>()
+        .add_systems(Update, (salt_system, (use_object_system, change_request_system).chain(), pawn_spawn).chain())
         .run();
 }
 
-#[derive(Component)]
-pub struct Size(Coord);
-
-#[derive(Component)]
-pub struct Person;
-
-#[derive(Component)]
-pub struct Name(String);
-
-#[derive(Component)]
-pub struct AI(u8, u8);
 
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2d);
-    add_people(commands);
-}
+    let agent_id = commands.spawn((
+        Type(Item::Agent),
+        Location::World { x: 0.0, y: 0.0 },
+        Size{width:BRICK_SIZE as i32, height:BRICK_SIZE as i32},
+        Hp(10),
+        Energy(10),
 
-fn add_people(mut commands: Commands) {
+/*
+        Sprite {
+            color: BRICK_COLOR,
+            ..default()
+        },
+*/
+        Transform {
+            translation: vec2(0.0, 0.0).extend(0.0),
+            scale: Vec3::new(BRICK_SIZE, BRICK_SIZE, 1.0),
+            ..default()
+        },
+    )).id();
     commands.spawn((
-        Person,
-        Name("Elaina Proctor".to_string()),
-        AI(0, 14),
+        Type(Item::Axe),
+        Location::Inventory(agent_id),
+        Size{width:BRICK_SIZE as i32, height:BRICK_SIZE as i32},
+/*
         Sprite {
             color: BRICK_COLOR,
             ..default()
@@ -69,36 +88,37 @@ fn add_people(mut commands: Commands) {
             scale: Vec3::new(BRICK_SIZE.x, BRICK_SIZE.y, 1.0),
             ..default()
         },
-        Size((BRICK_SIZE.x as i32, BRICK_SIZE.y as i32)),
+*/
     ));
+
     commands.spawn((
-        Person,
-        Name("Renzo Hume".to_string()),
-        AI(0, 1),
+        Type(Item::Tree),
+        Location::Inventory(agent_id),
+        Size{width:BRICK_SIZE as i32, height:BRICK_SIZE as i32},
+
+        /*
         Sprite {
             color: BRICK_COLOR,
             ..default()
-        },
+        },*/
         Transform {
-            translation: vec2(BRICK_SIZE.x + 5.0, 0.0).extend(0.0),
-            scale: Vec3::new(BRICK_SIZE.x, BRICK_SIZE.y, 1.0),
+            translation: vec2(0.0, 19.0).extend(0.0),
+            scale: Vec3::new(BRICK_SIZE, BRICK_SIZE, 1.0),
             ..default()
         },
-        Size((BRICK_SIZE.x as i32, BRICK_SIZE.y as i32)),
     ));
-    commands.spawn((
-        Person,
-        Name("Zayna Nieves".to_string()),
-        AI(10, 10),
-        Sprite {
-            color: BRICK_COLOR,
-            ..default()
-        },
-        Transform {
-            translation: vec2(BRICK_SIZE.x + 5.0, BRICK_SIZE.y + 5.0).extend(0.0),
-            scale: Vec3::new(BRICK_SIZE.x, BRICK_SIZE.y, 1.0),
-            ..default()
-        },
-        Size((BRICK_SIZE.x as i32, BRICK_SIZE.y as i32)),
-    ));
+/*
+    let mut world = World::from((
+        HashMap::from([
+            (0, ),
+            (1, Location::Inventory(0)),
+            (2, Location::World { x: 0.0, y: 19.0 }),
+        ]),
+
+        HashMap::from([
+            (0, (GRID_SIZE, GRID_SIZE)),
+            (2, (GRID_SIZE, GRID_SIZE)),
+        ]),
+        HashMap::from([(0, Item::Agent), (1, Item::Axe), (2, Item::Tree)]),
+*/
 }

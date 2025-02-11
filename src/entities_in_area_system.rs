@@ -21,7 +21,6 @@ pub fn entities_in_area_system(
     mut entities_requests: EventReader<EntitiesInAreaRequest>,
     query: Query<(Entity, &Transform, &Size)>,
 ) {
-    println!("entities-----");
     // gathering up the (AI) queries so that we can loop over then for each
     // entity in the (bevy) query.
     let inquiries: HashMap<Entity, Vec<Aabb2d>> = entities_requests.read().fold(
@@ -55,7 +54,7 @@ pub fn entities_in_area_system(
     // then in the appropratie (AI) queries
     for (id, pos, size) in &query {
         // building the Aabb2d for this entity
-        let half_size = vec2(size.0.0 as f32 * 0.5, size.0.0 as f32 * 0.5);
+        let half_size = vec2(size.width as f32 * 0.5, size.height as f32 * 0.5);
         let aabb = Aabb2d::new(pos.translation.truncate() + half_size, half_size);
 
         // looping over the querying agents
