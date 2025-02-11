@@ -692,7 +692,7 @@ dependencies = [
  "bytemuck",
  "derive_more",
  "futures-lite",
- "image 0.25.5",
+ "image",
  "ktx2",
  "ruzstd",
  "serde",
@@ -794,7 +794,7 @@ checksum = "edec18d90e6bab27b5c6131ee03172ece75b7edd0abe4e482a26d6db906ec357"
 dependencies = [
  "bevy_reflect",
  "derive_more",
- "glam 0.29.2",
+ "glam",
  "itertools",
  "rand",
  "rand_distr",
@@ -831,7 +831,7 @@ version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b53f0cf879a0682280937f515ecf00ab2140f7224881d6a621f40093a36a2ef6"
 dependencies = [
- "glam 0.29.2",
+ "glam",
 ]
 
 [[package]]
@@ -907,7 +907,7 @@ dependencies = [
  "disqualified",
  "downcast-rs",
  "erased-serde",
- "glam 0.29.2",
+ "glam",
  "petgraph",
  "serde",
  "smallvec",
@@ -960,7 +960,7 @@ dependencies = [
  "downcast-rs",
  "encase",
  "futures-lite",
- "image 0.25.5",
+ "image",
  "js-sys",
  "ktx2",
  "naga",
@@ -1483,12 +1483,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "color_quant"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d7b894f5411737b7867f4827955924d7c254fc9f4d91a6aad6b097804b1018b"
-
-[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1840,7 +1834,7 @@ checksum = "b0a05902cf601ed11d564128448097b98ebe3c6574bd7b6a653a3d56d54aa020"
 dependencies = [
  "const_panic",
  "encase_derive",
- "glam 0.29.2",
+ "glam",
  "thiserror",
 ]
 
@@ -1901,7 +1895,6 @@ dependencies = [
  "macros",
  "nom",
  "qol",
- "tales-of-tails",
  "thats_so_random",
 ]
 
@@ -2020,16 +2013,6 @@ dependencies = [
  "slotmap",
  "tinyvec",
  "ttf-parser 0.20.0",
-]
-
-[[package]]
-name = "fontdue"
-version = "0.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0793f5137567643cf65ea42043a538804ff0fbf288649e2141442b602d81f9bc"
-dependencies = [
- "hashbrown 0.13.2",
- "ttf-parser 0.15.2",
 ]
 
 [[package]]
@@ -2170,12 +2153,6 @@ dependencies = [
  "log",
  "xml-rs",
 ]
-
-[[package]]
-name = "glam"
-version = "0.27.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e05e7e6723e3455f4818c7b26e855439f7546cf617ef669d1adedb8669e5cb9"
 
 [[package]]
 name = "glam"
@@ -2320,15 +2297,6 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
-version = "0.13.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43a3c133739dddd0d2990f9a4bdf8eb4b21ef50e4851ca85ab661199821d510e"
-dependencies = [
- "ahash",
-]
-
-[[package]]
-name = "hashbrown"
 version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
@@ -2360,7 +2328,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d9c9e718d32b6e6b2b32354e1b0367025efdd0b11d6a740b905ddf5db1074679"
 dependencies = [
  "constgebra",
- "glam 0.29.2",
+ "glam",
  "tinyvec",
 ]
 
@@ -2369,19 +2337,6 @@ name = "hexf-parse"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
-
-[[package]]
-name = "image"
-version = "0.24.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5690139d2f55868e080017335e4b94cb7414274c74f1669c84fb5feba2c9f69d"
-dependencies = [
- "bytemuck",
- "byteorder",
- "color_quant",
- "num-traits",
- "png",
-]
 
 [[package]]
 name = "image"
@@ -2630,27 +2585,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "macroquad"
-version = "0.4.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81fef16b2d4de22ac372b5d7d76273c0ead0a31f9de9bc649af8f816816db8a8"
-dependencies = [
- "fontdue",
- "glam 0.27.0",
- "image 0.24.9",
- "macroquad_macro",
- "miniquad",
- "quad-rand",
- "slotmap",
-]
-
-[[package]]
-name = "macroquad_macro"
-version = "0.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64b1d96218903768c1ce078b657c0d5965465c95a60d2682fd97443c9d2483dd"
-
-[[package]]
 name = "macros"
 version = "0.1.0"
 dependencies = [
@@ -2712,18 +2646,6 @@ name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
-
-[[package]]
-name = "miniquad"
-version = "0.4.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2124e5e6bab86d96f263d78dc763c29e0da4c4f7ff0e1bb33f1d3905d1121262"
-dependencies = [
- "libc",
- "ndk-sys 0.2.2",
- "objc",
- "winapi",
-]
 
 [[package]]
 name = "miniz_oxide"
@@ -2811,12 +2733,6 @@ name = "ndk-context"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "27b02d87554356db9e9a873add8782d4ea6e3e58ea071a9adb9a2e8ddb884a8b"
-
-[[package]]
-name = "ndk-sys"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1bcdd74c20ad5d95aacd60ef9ba40fdf77f767051040541df557b7a9b2a2121"
 
 [[package]]
 name = "ndk-sys"
@@ -3397,12 +3313,6 @@ version = "0.1.17"
 source = "git+https://github.com/DrAlta/rust_quality_of_life.git#d679796017285b368dcabc6cec53bdd3cf24adfb"
 
 [[package]]
-name = "quad-rand"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a651516ddc9168ebd67b24afd085a718be02f8858fe406591b013d101ce2f40"
-
-[[package]]
 name = "quote"
 version = "1.0.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3884,14 +3794,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tales-of-tails"
-version = "0.1.4"
-dependencies = [
- "macroquad",
- "qol",
-]
-
-[[package]]
 name = "termcolor"
 version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4062,12 +3964,6 @@ dependencies = [
  "tracing-subscriber",
  "wasm-bindgen",
 ]
-
-[[package]]
-name = "ttf-parser"
-version = "0.15.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b3e06c9b9d80ed6b745c7159c40b311ad2916abb34a49e9be2653b90db0d8dd"
 
 [[package]]
 name = "ttf-parser"

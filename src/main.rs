@@ -4,18 +4,18 @@
 //!
 //! the AI system process the agents and if a agent is is waitng for world_pull result then it's counter is incremented then a check ot see if it's been to long and the instruction should fail.
 //!  if the agent isn't waiting it ticks the agent's AI
-use bevy::{math::vec2, prelude::*};
+use bevy::prelude::*;
 
 mod entities_in_area_system;
 pub use entities_in_area_system::entities_in_area_system;
-use ethnolib::sandbox::{
+use ethnolib::{sandbox::{
     actions::{use_object_system, PosibleActionsRequest, PosibleActionsResponce, UseRequest}, change_request::change_request_system, world::{Energy, Hp, Item, Size, Type}, Location
-};
+}, Number};
 
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
 
-const BRICK_SIZE: f32 = 30.0 ;
+const BRICK_SIZE: Number = 30.0 ;
 
 type Coord = (i32, i32);
 
@@ -61,51 +61,17 @@ fn setup(mut commands: Commands) {
         Size{width:BRICK_SIZE as i32, height:BRICK_SIZE as i32},
         Hp(10),
         Energy(10),
-
-/*
-        Sprite {
-            color: BRICK_COLOR,
-            ..default()
-        },
-*/
-        Transform {
-            translation: vec2(0.0, 0.0).extend(0.0),
-            scale: Vec3::new(BRICK_SIZE, BRICK_SIZE, 1.0),
-            ..default()
-        },
     )).id();
     commands.spawn((
         Type(Item::Axe),
         Location::Inventory(agent_id),
         Size{width:BRICK_SIZE as i32, height:BRICK_SIZE as i32},
-/*
-        Sprite {
-            color: BRICK_COLOR,
-            ..default()
-        },
-        Transform {
-            translation: vec2(0.0, 0.0).extend(0.0),
-            scale: Vec3::new(BRICK_SIZE.x, BRICK_SIZE.y, 1.0),
-            ..default()
-        },
-*/
     ));
 
     commands.spawn((
         Type(Item::Tree),
-        Location::Inventory(agent_id),
+        Location::World { x: BRICK_SIZE * 3.0, y: 0.0 },
         Size{width:BRICK_SIZE as i32, height:BRICK_SIZE as i32},
-
-        /*
-        Sprite {
-            color: BRICK_COLOR,
-            ..default()
-        },*/
-        Transform {
-            translation: vec2(0.0, 19.0).extend(0.0),
-            scale: Vec3::new(BRICK_SIZE, BRICK_SIZE, 1.0),
-            ..default()
-        },
     ));
 /*
     let mut world = World::from((

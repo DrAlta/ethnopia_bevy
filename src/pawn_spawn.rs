@@ -1,5 +1,5 @@
-use bevy::{math::vec2, color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, PINK, RED, YELLOW}, prelude::*};
-use ethnolib::sandbox::{world::{Size, Type}, Item, Location};
+use bevy::{color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, PINK, RED, YELLOW}, prelude::*};
+use ethnolib::{sandbox::{world::{Size, Type}, Item, Location}, Number};
 
 #[derive(Debug, Clone, PartialEq, Component)]
 pub struct Pawn(Entity);
@@ -14,7 +14,7 @@ pub fn pawn_spawn(
         // if the entity is in the world make sure it has a paen
         if let &Location::World { x, y } = location {
             let (width, height) = if let Some(&Size{ width, height }) = size_maybe {
-                (width as f32, height as f32)
+                (width as Number, height as Number)
             } else {
                 (crate::BRICK_SIZE, crate::BRICK_SIZE)
             };
@@ -35,7 +35,7 @@ pub fn pawn_spawn(
             } else {
                 PINK
             });
-            let translate = Vec3{x, y, z: 0.0};
+            let translate = Vec3{x: x as f32, y: y as f32, z: 0.0};
             // see if it already has pawn
             if let Some(&Pawn(pawn_id)) = pawn_maybe {
                 // it has a paen so try to get it
@@ -47,8 +47,8 @@ pub fn pawn_spawn(
                     } else {
                     // the pawn didn't have a translation so add one
                         commands.entity(pawn_id).insert(Transform {
-                            translation: vec2(x, y).extend(0.0),
-                            scale: Vec3::new(width, height, 1.0),
+                            translation: bevy::math::vec2(x as f32, y as f32).extend(0.0),
+                            scale: Vec3::new(width as f32, height as f32, 1.0),
                             ..default()
                         });
                     }
@@ -71,8 +71,8 @@ pub fn pawn_spawn(
                 }
                 // the entity didn't have a pawn so create one
                 let transform = Transform {
-                    translation: vec2(x, y).extend(0.0),
-                    scale: Vec3::new(width, height, 1.0),
+                    translation: bevy::math::vec2(x as f32, y as f32).extend(0.0),
+                    scale: Vec3::new(width as f32, height as f32, 1.0),
                     ..default()
                 };
                 let sprite = Sprite {
