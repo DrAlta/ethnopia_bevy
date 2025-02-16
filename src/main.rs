@@ -8,14 +8,23 @@ use bevy::prelude::*;
 
 mod entities_in_area_system;
 pub use entities_in_area_system::entities_in_area_system;
-use ethnolib::{sandbox::{
-    actions::{use_object_system, PosibleActionsRequest, PosibleActionsResponce, UseRequest}, change_request::change_request_system, world::{Energy, Hp, Item, Size, Type}, Location
-}, Number};
+use ethnolib::{
+    Number,
+    sandbox::{
+        Location,
+        actions::{PosibleActionsRequest, PosibleActionsResponce, UseRequest, use_object_system},
+        change_request::{
+            ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest, ChangeSpawnLocationType,
+            change_request_system,
+        },
+        world::{Energy, Hp, Item, Size, Type},
+    },
+};
 
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
 
-const BRICK_SIZE: Number = 30.0 ;
+const BRICK_SIZE: Number = 30.0;
 
 type Coord = (i32, i32);
 
@@ -48,43 +57,65 @@ fn main() {
         .add_event::<UseRequest>()
         .add_event::<PosibleActionsRequest>()
         .add_event::<PosibleActionsResponce>()
-        .add_systems(Update, (salt_system, (use_object_system, change_request_system).chain(), pawn_spawn).chain())
+        .add_event::<ChangeRequest>()
+        .add_event::<ChangeDespawn>()
+        .add_event::<ChangeEnergy>()
+        .add_event::<ChangeHp>()
+        .add_event::<ChangeSpawnLocationType>()
+        .add_systems(
+            Update,
+            (
+                salt_system,
+                (use_object_system, change_request_system).chain(),
+                pawn_spawn,
+            )
+                .chain(),
+        )
         .run();
 }
 
-
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2d);
-    let agent_id = commands.spawn((
-        Type(Item::Agent),
-        Location::World { x: 0.0, y: 0.0 },
-        Size{width:BRICK_SIZE as i32, height:BRICK_SIZE as i32},
-        Hp(10),
-        Energy(10),
-    )).id();
-    commands.spawn((
-        Type(Item::Axe),
-        Location::Inventory(agent_id),
-        Size{width:BRICK_SIZE as i32, height:BRICK_SIZE as i32},
-    ));
+    let agent_id = commands
+        .spawn((
+            Type(Item::Agent),
+            Location::World { x: 0.0, y: 0.0 },
+            Size {
+                width: BRICK_SIZE as i32,
+                height: BRICK_SIZE as i32,
+            },
+            Hp(10),
+            Energy(10),
+        ))
+        .id();
+    commands.spawn((Type(Item::Axe), Location::Inventory(agent_id), Size {
+        width: BRICK_SIZE as i32,
+        height: BRICK_SIZE as i32,
+    }));
 
     commands.spawn((
         Type(Item::Tree),
-        Location::World { x: BRICK_SIZE * 3.0, y: 0.0 },
-        Size{width:BRICK_SIZE as i32, height:BRICK_SIZE as i32},
+        Location::World {
+            x: BRICK_SIZE * 3.0,
+            y: 0.0,
+        },
+        Size {
+            width: BRICK_SIZE as i32,
+            height: BRICK_SIZE as i32,
+        },
     ));
-/*
-    let mut world = World::from((
-        HashMap::from([
-            (0, ),
-            (1, Location::Inventory(0)),
-            (2, Location::World { x: 0.0, y: 19.0 }),
-        ]),
+    /*
+        let mut world = World::from((
+            HashMap::from([
+                (0, ),
+                (1, Location::Inventory(0)),
+                (2, Location::World { x: 0.0, y: 19.0 }),
+            ]),
 
-        HashMap::from([
-            (0, (GRID_SIZE, GRID_SIZE)),
-            (2, (GRID_SIZE, GRID_SIZE)),
-        ]),
-        HashMap::from([(0, Item::Agent), (1, Item::Axe), (2, Item::Tree)]),
-*/
+            HashMap::from([
+                (0, (GRID_SIZE, GRID_SIZE)),
+                (2, (GRID_SIZE, GRID_SIZE)),
+            ]),
+            HashMap::from([(0, Item::Agent), (1, Item::Axe), (2, Item::Tree)]),
+    */
 }
