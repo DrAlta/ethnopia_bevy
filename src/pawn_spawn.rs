@@ -31,7 +31,7 @@ pub fn pawn_spawn(
             let (width, height) = if let Some(&Size { width, height }) = size_maybe {
                 (width as Number, height as Number)
             } else {
-                (crate::BRICK_SIZE, crate::BRICK_SIZE)
+                (crate::CELL_SIZE, crate::CELL_SIZE)
             };
             let color = Color::Srgba(if let Some(Type(tyep)) = tyep_maybe {
                 const DARKGRAY: Srgba = Srgba::rgb(0.31, 0.31, 0.31);

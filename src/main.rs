@@ -6,48 +6,23 @@
 //!  if the agent isn't waiting it ticks the agent's AI
 use bevy::prelude::*;
 
-mod entities_in_area_system;
-pub use entities_in_area_system::entities_in_area_system;
+use dev_comsole::collision_report_system;
 use ethnolib::{
-    Number,
     sandbox::{
-        Location,
-        actions::{PosibleActionsRequest, PosibleActionsResponce, UseRequest, use_object_system},
-        change_request::{
-            ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest, ChangeSpawnLocationType,
-            change_request_system,
-        },
-        world::{Energy, Hp, Item, Size, Type},
-    },
+        actions::{use_object_system, PosibleActionsRequest, PosibleActionsResponce, UseRequest}, change_request::{
+            change_request_system, ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest, ChangeSpawnLocationType
+        }, process_movement, world::{Energy, Hp, Item, Movement, Size, Type}, Collision, TravelCompleted, Location
+    }, Number, Vec2
 };
 
+mod dev_comsole;
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
+mod salt;
+pub use salt::{Salt,  salt_system};
 
-const BRICK_SIZE: Number = 30.0;
+const CELL_SIZE: Number = 30.0;
 
-type Coord = (i32, i32);
-
-#[derive(Event, Debug)]
-pub struct EntitiesInAreaReponse {
-    pub agent_id: Entity,
-    pub entitie_ids: Vec<Entity>,
-}
-
-#[derive(Event, Debug)]
-pub struct EntitiesInAreaRequest {
-    pub agent_id: Entity,
-    pub pos: Coord,
-    pub size: Coord,
-}
-
-#[derive(Debug, Resource)]
-pub struct Salt(u64);
-
-pub fn salt_system(mut salt: ResMut<Salt>) {
-    salt.0 += 1;
-    println!("----salt {}", salt.0);
-}
 
 fn main() {
     App::new()
@@ -57,7 +32,10 @@ fn main() {
         .add_event::<UseRequest>()
         .add_event::<PosibleActionsRequest>()
         .add_event::<PosibleActionsResponce>()
+        .add_event::<TravelCompleted>()
+        .add_event::<Collision>()
         .add_event::<ChangeRequest>()
+        .add_event::<ChangeConflict>()
         .add_event::<ChangeDespawn>()
         .add_event::<ChangeEnergy>()
         .add_event::<ChangeHp>()
@@ -66,6 +44,8 @@ fn main() {
             Update,
             (
                 salt_system,
+                process_movement,
+                collision_report_system,
                 (use_object_system, change_request_system).chain(),
                 pawn_spawn,
             )
@@ -81,27 +61,28 @@ fn setup(mut commands: Commands) {
             Type(Item::Agent),
             Location::World { x: 0.0, y: 0.0 },
             Size {
-                width: BRICK_SIZE as i32,
-                height: BRICK_SIZE as i32,
+                width: CELL_SIZE as i32,
+                height: CELL_SIZE as i32,
             },
             Hp(10),
             Energy(10),
+            Movement{ target: Vec2{x: 200.0, y: 5.0}, speed: 5.0 }
         ))
         .id();
     commands.spawn((Type(Item::Axe), Location::Inventory(agent_id), Size {
-        width: BRICK_SIZE as i32,
-        height: BRICK_SIZE as i32,
+        width: CELL_SIZE as i32,
+        height: CELL_SIZE as i32,
     }));
 
     commands.spawn((
         Type(Item::Tree),
         Location::World {
-            x: BRICK_SIZE * 3.0,
+            x: CELL_SIZE * 3.0,
             y: 0.0,
         },
         Size {
-            width: BRICK_SIZE as i32,
-            height: BRICK_SIZE as i32,
+            width: CELL_SIZE as i32,
+            height: CELL_SIZE as i32,
         },
     ));
     /*
