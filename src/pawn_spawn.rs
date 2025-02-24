@@ -1,17 +1,17 @@
 use bevy::{
-    color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, PINK, RED, YELLOW},
+    color::palettes::css::PINK,
     prelude::*,
 };
 use ethnolib::{
     Number,
     sandbox::{
-        Item, Location,
+        Location,
         world::{Size, Type},
     },
 };
 
 #[derive(Debug, Clone, PartialEq, Component)]
-pub struct Pawn(Entity);
+pub struct Pawn(pub Entity);
 
 pub fn pawn_spawn(
     mut pawn_query: Query<(Entity, Option<&mut Transform>, Option<&mut Sprite>)>,
@@ -33,23 +33,11 @@ pub fn pawn_spawn(
             } else {
                 (crate::CELL_SIZE, crate::CELL_SIZE)
             };
-            let color = Color::Srgba(if let Some(Type(tyep)) = tyep_maybe {
-                const DARKGRAY: Srgba = Srgba::rgb(0.31, 0.31, 0.31);
-                const DARKBROWN: Srgba = Srgba::rgb(0.3, 0.25, 0.18);
-                match tyep {
-                    Item::Agent => BLUE,
-                    Item::Axe => GRAY,
-                    Item::Food => YELLOW,
-                    Item::Stone => DARKGRAY,
-                    Item::Stick => BROWN,
-                    Item::Wood => DARKBROWN,
-                    Item::House => RED,
-                    Item::Tree => GREEN,
-                    Item::Veggie => ORANGE,
-                }
+            let color = if let Some(Type(tyep)) = tyep_maybe {
+                crate::type_to_color(tyep)
             } else {
-                PINK
-            });
+                PINK.into()
+            };
             let translate = Vec3 {
                 x: x as f32,
                 y: y as f32,
@@ -57,7 +45,7 @@ pub fn pawn_spawn(
             };
             // see if it already has pawn
             if let Some(&Pawn(pawn_id)) = pawn_maybe {
-                // it has a paen so try to get it
+                // it has a pawn so try to get it
                 if let Ok((_, transform_maybe, sprite_maybe)) = pawn_query.get_mut(pawn_id) {
                     done.push(pawn_id);
                     // the pawn had a transgorm os set the translaion
@@ -72,8 +60,9 @@ pub fn pawn_spawn(
                         });
                     }
                     // the pawn has a sprite so set it's color
-                    if let Some(mut sprite) = sprite_maybe {
-                        sprite.color = color;
+                    if let Some(_sprite) = sprite_maybe {
+                        // re don't update so we can highlight it when we hover
+                        //sprite.color = color;
                     } else {
                         // the pawn didn't have a sprite so create one
                         commands

@@ -3804,8 +3804,8 @@ dependencies = [
 
 [[package]]
 name = "thats_so_random"
-version = "0.2.3"
-source = "git+https://github.com/DrAlta/thats_so_random.rs.git#95648a839e77da9618ea05ca53b5144189fcdc6b"
+version = "0.2.4"
+source = "git+https://github.com/DrAlta/thats_so_random.rs.git#f81391dc661688960f2c3332c9e9ca719f57895f"
 
 [[package]]
 name = "thiserror"

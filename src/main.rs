@@ -4,21 +4,26 @@
 //!
 //! the AI system process the agents and if a agent is is waitng for world_pull result then it's counter is incremented then a check ot see if it's been to long and the instruction should fail.
 //!  if the agent isn't waiting it ticks the agent's AI
-use bevy::prelude::*;
-
+use bevy::{
+    color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, RED, YELLOW},
+    prelude::*,
+};
 use dev_comsole::collision_report_system;
 use ethnolib::{
     sandbox::{
         actions::{use_object_system, PosibleActionsRequest, PosibleActionsResponce, UseRequest}, change_request::{
             change_request_system, ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest, ChangeSpawnLocationType
-        }, process_movement, world::{Energy, Hp, Item, Movement, Size, Type}, Collision, TravelCompleted, Location
-    }, Number, Vec2
+        }, process_movement, world::{Energy, Hp, Item, Size, Type}, Collision, TravelCompleted, Location
+    }, Number,
 };
 
 mod dev_comsole;
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
+//mod picking;
+//use picking::{cursor_hovering_system, CursorOnPawn, Picky};
 mod salt;
+mod picking2;
 pub use salt::{Salt,  salt_system};
 
 const CELL_SIZE: Number = 30.0;
@@ -46,8 +51,13 @@ fn main() {
                 salt_system,
                 process_movement,
                 collision_report_system,
-                (use_object_system, change_request_system).chain(),
+                (
+                    use_object_system,
+                    change_request_system
+                ).chain(),
                 pawn_spawn,
+                picking2::picking_system,
+                picking2::hover_out_system,
             )
                 .chain(),
         )
@@ -66,7 +76,7 @@ fn setup(mut commands: Commands) {
             },
             Hp(10),
             Energy(10),
-            Movement{ target: Vec2{x: 200.0, y: 5.0}, speed: 5.0 }
+        //    Movement{ target: Vec2{x: 200.0, y: 5.0}, speed: 5.0 }
         ))
         .id();
     commands.spawn((Type(Item::Axe), Location::Inventory(agent_id), Size {
@@ -85,6 +95,10 @@ fn setup(mut commands: Commands) {
             height: CELL_SIZE as i32,
         },
     ));
+    commands.spawn((
+        Text2d::new("hello world!"),
+        Transform::from_xyz(0.0, 30.0, 0.0)
+    ));
     /*
         let mut world = World::from((
             HashMap::from([
@@ -99,4 +113,22 @@ fn setup(mut commands: Commands) {
             ]),
             HashMap::from([(0, Item::Agent), (1, Item::Axe), (2, Item::Tree)]),
     */
+}
+
+pub fn type_to_color(tyep: &Item) -> Color {
+    const DARKGRAY: Srgba = Srgba::rgb(0.31, 0.31, 0.31);
+    const DARKBROWN: Srgba = Srgba::rgb(0.3, 0.25, 0.18);
+    Color::Srgba(
+        match tyep {
+            Item::Agent => BLUE,
+            Item::Axe => GRAY,
+            Item::Food => YELLOW,
+            Item::Stone => DARKGRAY,
+            Item::Stick => BROWN,
+            Item::Wood => DARKBROWN,
+            Item::House => RED,
+            Item::Tree => GREEN,
+            Item::Veggie => ORANGE,
+        }
+    )
 }
