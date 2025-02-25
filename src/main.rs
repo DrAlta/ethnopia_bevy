@@ -25,6 +25,7 @@ use pawn_spawn::pawn_spawn;
 mod salt;
 mod picking2;
 pub use salt::{Salt,  salt_system};
+mod ui;
 
 const CELL_SIZE: Number = 30.0;
 
@@ -33,6 +34,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .insert_resource(Salt(0))
+        .insert_resource(ui::UIState{ selected_entity: None, mode: ui::Mode::Pan, actions: Vec::new() })
         .add_systems(Startup, setup)
         .add_event::<UseRequest>()
         .add_event::<PosibleActionsRequest>()
@@ -45,6 +47,7 @@ fn main() {
         .add_event::<ChangeEnergy>()
         .add_event::<ChangeHp>()
         .add_event::<ChangeSpawnLocationType>()
+        .add_event::<ui::UISelect>()
         .add_systems(
             Update,
             (
@@ -58,6 +61,7 @@ fn main() {
                 pawn_spawn,
                 picking2::picking_system,
                 picking2::hover_out_system,
+                ui::ui_system,
             )
                 .chain(),
         )
