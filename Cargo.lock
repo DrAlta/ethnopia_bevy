@@ -1244,16 +1244,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevytest"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "ethnopians",
- "log",
- "qol",
-]
-
-[[package]]
 name = "bindgen"
 version = "0.70.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1885,8 +1875,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "ethnopia_bevy"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "ethnopians",
+ "log",
+ "qol",
+]
+
+[[package]]
 name = "ethnopians"
 version = "0.2.0"
+source = "git+https://github.com/DrAlta/ethnopians.git?branch=bevy#e1790410f53a618cf208bc4e4aebf57b582042bf"
 dependencies = [
  "base64 0.22.1",
  "bevy",
@@ -2587,6 +2588,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
+source = "git+https://github.com/DrAlta/ethnopians.git?branch=bevy#e1790410f53a618cf208bc4e4aebf57b582042bf"
 dependencies = [
  "proc-macro2",
  "quote",

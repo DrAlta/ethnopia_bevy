@@ -1,5 +1,5 @@
 [package]
-name = "bevytest"
+name = "ethnopia_bevy"
 version = "0.1.0"
 edition = "2024"
 
@@ -7,7 +7,8 @@ edition = "2024"
 bevy = { version = "0.15.1", features = ["dynamic_linking"] }
 log = { version = "*", features = ["max_level_debug", "release_max_level_warn"] }
 qol = { version = "0.1.17", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
-ethnopians = {path= "../ethnopians/", features = ["sandbox"], default-features = false}
+#ethnopians = {path= "../ethnopians/", features = ["sandbox"], default-features = false}
+ethnopians = {git= "https://github.com/DrAlta/ethnopians.git", branch = "bevy", features = ["sandbox"], default-features = false}
 
 
 # Enable a small amount of optimization in the dev profile.
