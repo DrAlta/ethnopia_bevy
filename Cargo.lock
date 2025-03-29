@@ -1886,8 +1886,7 @@ dependencies = [
 
 [[package]]
 name = "ethnopians"
-version = "0.2.0"
-source = "git+https://github.com/DrAlta/ethnopians.git?branch=bevy#e1790410f53a618cf208bc4e4aebf57b582042bf"
+version = "0.2.3"
 dependencies = [
  "base64 0.22.1",
  "bevy",
@@ -1895,6 +1894,7 @@ dependencies = [
  "fraction64",
  "macros",
  "nom",
+ "ordered-f32",
  "qol",
  "thats_so_random",
 ]
@@ -2588,7 +2588,6 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
-source = "git+https://github.com/DrAlta/ethnopians.git?branch=bevy#e1790410f53a618cf208bc4e4aebf57b582042bf"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3122,6 +3121,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ordered-f32"
+version = "0.1.11"
+source = "git+https://github.com/DrAlta/rust-ordered-f32.git#f5730b72ca582279cae1596c085bcbfae6dc220b"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "overload"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3311,8 +3318,8 @@ checksum = "afbdc74edc00b6f6a218ca6a5364d6226a259d4b8ea1af4a0ea063f27e179f4d"
 
 [[package]]
 name = "qol"
-version = "0.1.17"
-source = "git+https://github.com/DrAlta/rust_quality_of_life.git#d679796017285b368dcabc6cec53bdd3cf24adfb"
+version = "0.1.19"
+source = "git+https://github.com/DrAlta/rust_quality_of_life.git#4f8fb19e189e17cb46b10a5d12fef2430732e731"
 
 [[package]]
 name = "quote"

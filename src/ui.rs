@@ -1,9 +1,9 @@
-use bevy::{color::palettes::css::PINK, prelude::*};
+use bevy::{color::palettes::css::PINK, picking::focus::HoverMap, prelude::*};
 use ethnolib::sandbox::actions::PosibleActionsResponce;
 use qol::logy;
 
 use crate::pawn_spawn::Pawn;
-
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum Mode {
     Pan,
@@ -29,18 +29,30 @@ pub fn ui_system(
     mut select_event: EventReader<UISelect>,
     mut actions_event: EventReader<PosibleActionsResponce>,
     mut ui_state: ResMut<UIState>,
+    hover_map: Res<HoverMap>,
     mut text_query: Query<&mut Text2d>,
 
 
 ) {
-
     let mut select = None;
     for x in select_event.read(){
         select = Some(x.0)
     }
     
     let Some(thing) = select else {
-        return
+        let mut text = text_query.single_mut();
+        let x = hover_map.iter().next().unwrap().1.keys();
+        println!("updating text");
+        text.0 = format!(
+            "{:?}{}",
+            x,
+            match ui_state.mode {
+                Mode::Pan => "P",
+                Mode::Move => "M",
+                Mode::Use => "U",
+            },
+        );
+           return
     };
 
     let Ok(Pawn(pawn_id)) = item_query.get(thing) else {
@@ -62,8 +74,11 @@ pub fn ui_system(
         ui_state.actions = collect_actions
     }
     let mut text = text_query.single_mut();
+    let x = hover_map.iter().next().unwrap().1.keys();
+    println!("updating text");
     text.0 = format!(
-        "{}{}\n{:#?}",
+        "{:?}{}{}\n{:#?}",
+        x,
         match ui_state.mode {
             Mode::Pan => "P",
             Mode::Move => "M",
@@ -72,4 +87,5 @@ pub fn ui_system(
         thing, 
         ui_state.actions
     );
+    
 }

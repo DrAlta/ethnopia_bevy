@@ -17,6 +17,7 @@ pub fn picking_system(
     mut select_event: EventWriter<UISelect>,
     ui_state: Res<UIState>,
 ){
+    //println!("pinking_system");
     let who_for: HashMap<Entity, Entity> = item_query.iter().map(|(entity, pawn)|(pawn.0.clone(), entity)).collect();
 
     let mut select = None;
@@ -60,6 +61,7 @@ pub fn hover_out_system(
     mut hovers: EventReader<Pointer<Out>>,
     ui_state: Res<UIState>,
 ){
+    //println!("hover_out_system");
     let who_for: HashMap<Entity, Entity> = item_query.iter().map(|(entity, pawn, _)|(pawn.0.clone(), entity)).collect();
 
 

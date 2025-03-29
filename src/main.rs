@@ -4,19 +4,21 @@
 //!
 //! the AI system process the agents and if a agent is is waitng for world_pull result then it's counter is incremented then a check ot see if it's been to long and the instruction should fail.
 //!  if the agent isn't waiting it ticks the agent's AI
+use agent::agent_system;
 use bevy::{
-    color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, RED, YELLOW},
+    color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, RED, STEEL_BLUE, TAN, YELLOW},
     prelude::*,
 };
 use dev_comsole::collision_report_system;
 use ethnolib::{
     sandbox::{
-        actions::{use_object_system, PosibleActionsRequest, PosibleActionsResponce, UseRequest}, change_request::{
+        actions::{goto_system, use_object_system, PosibleActionsRequest, PosibleActionsResponce, UseOnRequest, UseRequest}, change_request::{
             change_request_system, ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest, ChangeSpawnLocationType
-        }, process_movement, world::{Energy, Hp, Item, Size, Type}, Collision, TravelCompleted, Location
+        }, process_movement, world::{Energy, Hp, Item, Size, Type}, Collision, Location, TravelCompleted
     }, Number,
 };
 
+mod agent;
 mod dev_comsole;
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
@@ -27,7 +29,7 @@ mod picking2;
 pub use salt::{Salt,  salt_system};
 mod ui;
 
-const CELL_SIZE: Number = 30.0;
+const CELL_SIZE: Number = Number::new(30, 1);
 
 
 fn main() {
@@ -37,6 +39,7 @@ fn main() {
         .insert_resource(ui::UIState{ selected_entity: None, mode: ui::Mode::Pan, actions: Vec::new() })
         .add_systems(Startup, setup)
         .add_event::<UseRequest>()
+        .add_event::<UseOnRequest>()
         .add_event::<PosibleActionsRequest>()
         .add_event::<PosibleActionsResponce>()
         .add_event::<TravelCompleted>()
@@ -58,6 +61,8 @@ fn main() {
                     use_object_system,
                     change_request_system
                 ).chain(),
+                goto_system,
+                agent_system,
                 pawn_spawn,
                 picking2::picking_system,
                 picking2::hover_out_system,
@@ -73,10 +78,10 @@ fn setup(mut commands: Commands) {
     let agent_id = commands
         .spawn((
             Type(Item::Agent),
-            Location::World { x: 0.0, y: 0.0 },
+            Location::World { x: Number::ZERO, y: Number::ZERO },
             Size {
-                width: CELL_SIZE as i32,
-                height: CELL_SIZE as i32,
+                width: Into::<i32>::into(CELL_SIZE),
+                height: Into::<i32>::into(CELL_SIZE),
             },
             Hp(10),
             Energy(10),
@@ -84,19 +89,19 @@ fn setup(mut commands: Commands) {
         ))
         .id();
     commands.spawn((Type(Item::Axe), Location::Inventory(agent_id), Size {
-        width: CELL_SIZE as i32,
-        height: CELL_SIZE as i32,
+        width: Into::<i32>::into(CELL_SIZE),
+        height: Into::<i32>::into(CELL_SIZE),
     }));
 
     commands.spawn((
         Type(Item::Tree),
         Location::World {
             x: CELL_SIZE * 3.0,
-            y: 0.0,
+            y: Number::ZERO,
         },
         Size {
-            width: CELL_SIZE as i32,
-            height: CELL_SIZE as i32,
+            width: Into::<i32>::into(CELL_SIZE),
+            height: Into::<i32>::into(CELL_SIZE),
         },
     ));
     commands.spawn((
@@ -133,6 +138,8 @@ pub fn type_to_color(tyep: &Item) -> Color {
             Item::House => RED,
             Item::Tree => GREEN,
             Item::Veggie => ORANGE,
+            Item::Knife => STEEL_BLUE,
+            Item::Seed => TAN,
         }
     )
 }
