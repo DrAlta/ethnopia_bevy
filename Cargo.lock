@@ -1886,7 +1886,8 @@ dependencies = [
 
 [[package]]
 name = "ethnopians"
-version = "0.2.3"
+version = "0.2.4"
+source = "git+https://github.com/DrAlta/ethnopians.git?branch=bevy#b0e071e46fe95f2872f0a223b6e9413d13f2db14"
 dependencies = [
  "base64 0.22.1",
  "bevy",
@@ -2588,6 +2589,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
+source = "git+https://github.com/DrAlta/ethnopians.git?branch=bevy#b0e071e46fe95f2872f0a223b6e9413d13f2db14"
 dependencies = [
  "proc-macro2",
  "quote",
