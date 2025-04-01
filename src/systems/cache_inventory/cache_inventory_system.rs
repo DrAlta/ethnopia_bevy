@@ -16,10 +16,10 @@ pub fn cache_inventory_system(
             Some(Location::Inventory(container_id)) => {
                 todo.push_or_insert(*container_id, object_id);
             }
-            _ => ()
+            _ => (),
         }
     }
-    for (container_id, _, cache_inventory_maybe) in &mut query{
+    for (container_id, _, cache_inventory_maybe) in &mut query {
         let Some(mut cache_inventory) = cache_inventory_maybe else {
             continue;
         };
@@ -31,6 +31,8 @@ pub fn cache_inventory_system(
     // todo should now only contain the inventories of containers that didn't have a CacheInventory compone so wE'll add one to them
     for (container_id, mut inventory) in todo {
         inventory.shrink_to_fit();
-        commands.entity(container_id).insert(CacheInventory{inventory});
+        commands
+            .entity(container_id)
+            .insert(CacheInventory { inventory });
     }
 }

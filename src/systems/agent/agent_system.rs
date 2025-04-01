@@ -1,6 +1,12 @@
+use crate::systems::{
+    FindInInventoryRequest,
+    agent::{Agent, AgentState, handle_prayer},
+};
 use bevy::prelude::*;
-use ethnolib::sandbox::{actions::{ActionResult, GotoRequest, UseOnRequest}, ai::StackItem};
-use crate::systems::{agent::{handle_prayer, Agent, AgentState}, FindInInventoryRequest};
+use ethnolib::sandbox::{
+    actions::{ActionResult, GotoRequest, UseOnRequest},
+    ai::StackItem,
+};
 
 pub fn agent_system(
     mut query: Query<(Entity, &mut Agent)>,
@@ -9,10 +15,13 @@ pub fn agent_system(
     mut find_in_inventory_requests: EventWriter<FindInInventoryRequest>,
     mut use_on_requests: EventWriter<UseOnRequest>,
     mut commands: Commands,
-
 ) {
-
-    for ActionResult { agent_id, action_id, result } in action_result.read(){
+    for ActionResult {
+        agent_id,
+        action_id,
+        result,
+    } in action_result.read()
+    {
         let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
             continue;
         };
@@ -32,28 +41,29 @@ pub fn agent_system(
         }
     }
 
-
-    for (agent_id , mut agent) in &mut query {
-        let Agent { cpu, blackboard, bt , state} = agent.as_mut();
+    for (agent_id, mut agent) in &mut query {
+        let Agent {
+            cpu,
+            blackboard,
+            bt,
+            state,
+        } = agent.as_mut();
         match state {
-            AgentState::Running => {
-                match cpu.step(bt, blackboard) {
-                    Ok(ok) => {
-                        handle_prayer(
-                            agent_id, 
-                            ok, 
-                            cpu, 
-                            &mut goto_requests,
-                            &mut find_in_inventory_requests,
-                            &mut use_on_requests,
-                            state);
-                    },
-                    Err(_) => todo!(),
+            AgentState::Running => match cpu.step(bt, blackboard) {
+                Ok(ok) => {
+                    handle_prayer(
+                        agent_id,
+                        ok,
+                        cpu,
+                        &mut goto_requests,
+                        &mut find_in_inventory_requests,
+                        &mut use_on_requests,
+                        state,
+                    );
                 }
-            }
-            AgentState::WaitForAction(_action_id) => {
-                continue
+                Err(_) => todo!(),
             },
+            AgentState::WaitForAction(_action_id) => continue,
         }
     }
 }

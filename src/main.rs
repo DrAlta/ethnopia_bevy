@@ -9,17 +9,26 @@ use bevy::{
     prelude::*,
 };
 use ethnolib::{
+    Number,
     sandbox::{
-        actions::{goto_system, use_object_system, PosibleActionsRequest, PosibleActionsResponce, UseOnRequest, UseRequest}, change_request::{
-            change_request_system, ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest, ChangeSpawnLocationType
-        }, process_movement, world::{Energy, Hp, Item, Size, Type}, Collision, Location, TravelCompleted
-    }, Number,
+        Collision, Location, TravelCompleted,
+        actions::{
+            PosibleActionsRequest, PosibleActionsResponce, UseOnRequest, UseRequest, goto_system,
+            use_object_system,
+        },
+        change_request::{
+            ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest,
+            ChangeSpawnLocationType, change_request_system,
+        },
+        process_movement,
+        world::{Energy, Hp, Item, Size, Type},
+    },
 };
 
 mod dev_console;
 use dev_console::collision_report_system;
 pub mod systems;
-use systems::{agent_system, cache_inventory_system, find_in_inventory_system, salt_system, Salt};
+use systems::{Salt, agent_system, cache_inventory_system, find_in_inventory_system, salt_system};
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
 //mod picking;
@@ -29,12 +38,15 @@ mod ui;
 
 const CELL_SIZE: Number = Number::new(30, 1);
 
-
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .insert_resource(Salt(0))
-        .insert_resource(ui::UIState{ selected_entity: None, mode: ui::Mode::Pan, actions: Vec::new() })
+        .insert_resource(ui::UIState {
+            selected_entity: None,
+            mode: ui::Mode::Pan,
+            actions: Vec::new(),
+        })
         .add_systems(Startup, setup)
         .add_event::<UseRequest>()
         .add_event::<UseOnRequest>()
@@ -91,14 +103,17 @@ fn setup(mut commands: Commands) {
     let agent_id = commands
         .spawn((
             Type(Item::Agent),
-            Location::World { x: Number::ZERO, y: Number::ZERO },
+            Location::World {
+                x: Number::ZERO,
+                y: Number::ZERO,
+            },
             Size {
                 width: Into::<i32>::into(CELL_SIZE),
                 height: Into::<i32>::into(CELL_SIZE),
             },
             Hp(10),
             Energy(10),
-        //    Movement{ target: Vec2{x: 200.0, y: 5.0}, speed: 5.0 }
+            //    Movement{ target: Vec2{x: 200.0, y: 5.0}, speed: 5.0 }
         ))
         .id();
     commands.spawn((Type(Item::Axe), Location::Inventory(agent_id), Size {
@@ -119,7 +134,7 @@ fn setup(mut commands: Commands) {
     ));
     commands.spawn((
         Text2d::new("hello world!"),
-        Transform::from_xyz(0.0, 30.0, 0.0)
+        Transform::from_xyz(0.0, 30.0, 0.0),
     ));
     /*
         let mut world = World::from((
@@ -140,19 +155,17 @@ fn setup(mut commands: Commands) {
 pub fn type_to_color(tyep: &Item) -> Color {
     const DARKGRAY: Srgba = Srgba::rgb(0.31, 0.31, 0.31);
     const DARKBROWN: Srgba = Srgba::rgb(0.3, 0.25, 0.18);
-    Color::Srgba(
-        match tyep {
-            Item::Agent => BLUE,
-            Item::Axe => GRAY,
-            Item::Food => YELLOW,
-            Item::Stone => DARKGRAY,
-            Item::Stick => BROWN,
-            Item::Wood => DARKBROWN,
-            Item::House => RED,
-            Item::Tree => GREEN,
-            Item::Veggie => ORANGE,
-            Item::Knife => STEEL_BLUE,
-            Item::Seed => TAN,
-        }
-    )
+    Color::Srgba(match tyep {
+        Item::Agent => BLUE,
+        Item::Axe => GRAY,
+        Item::Food => YELLOW,
+        Item::Stone => DARKGRAY,
+        Item::Stick => BROWN,
+        Item::Wood => DARKBROWN,
+        Item::House => RED,
+        Item::Tree => GREEN,
+        Item::Veggie => ORANGE,
+        Item::Knife => STEEL_BLUE,
+        Item::Seed => TAN,
+    })
 }

@@ -1,5 +1,5 @@
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
-pub enum AgentState{
+pub enum AgentState {
     Running,
-    WaitForAction(u64)
+    WaitForAction(u64),
 }

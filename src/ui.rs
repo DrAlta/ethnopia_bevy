@@ -31,46 +31,45 @@ pub fn ui_system(
     mut ui_state: ResMut<UIState>,
     hover_map: Res<HoverMap>,
     mut text_query: Query<&mut Text2d>,
-
-
 ) {
     let mut select = None;
-    for x in select_event.read(){
+    for x in select_event.read() {
         select = Some(x.0)
     }
-    
+
     let Some(thing) = select else {
         let mut text = text_query.single_mut();
         let x = hover_map.iter().next().unwrap().1.keys();
         println!("updating text");
-        text.0 = format!(
-            "{:?}{}",
-            x,
-            match ui_state.mode {
-                Mode::Pan => "P",
-                Mode::Move => "M",
-                Mode::Use => "U",
-            },
-        );
-           return
+        text.0 = format!("{:?}{}", x, match ui_state.mode {
+            Mode::Pan => "P",
+            Mode::Move => "M",
+            Mode::Use => "U",
+        },);
+        return;
     };
 
     let Ok(Pawn(pawn_id)) = item_query.get(thing) else {
         logy!("debug", "coudn fins pawn id");
-        return
+        return;
     };
     let Ok(mut pawn) = sprit_query.get_mut(*pawn_id) else {
         logy!("debug", "couldn't fins pawn");
-        return
+        return;
     };
     ui_state.selected_entity = Some(thing);
     pawn.color = PINK.into();
-    let mut collect_actions =Vec::new();
-    for PosibleActionsResponce { agent_id:_ , target_id: _, action_id } in actions_event.read(){
+    let mut collect_actions = Vec::new();
+    for PosibleActionsResponce {
+        agent_id: _,
+        target_id: _,
+        action_id,
+    } in actions_event.read()
+    {
         logy!("debug", "adding action{action_id:?}");
         collect_actions.push(format!("{action_id:?}"))
     }
-    if ! collect_actions.is_empty(){
+    if !collect_actions.is_empty() {
         ui_state.actions = collect_actions
     }
     let mut text = text_query.single_mut();
@@ -84,8 +83,7 @@ pub fn ui_system(
             Mode::Move => "M",
             Mode::Use => "U",
         },
-        thing, 
+        thing,
         ui_state.actions
     );
-    
 }

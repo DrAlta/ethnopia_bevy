@@ -1,7 +1,4 @@
-use bevy::{
-    color::palettes::css::PINK,
-    prelude::*,
-};
+use bevy::{color::palettes::css::PINK, prelude::*};
 use ethnolib::{
     Number,
     sandbox::{
@@ -54,7 +51,11 @@ pub fn pawn_spawn(
                     } else {
                         // the pawn didn't have a translation so add one
                         commands.entity(pawn_id).insert(Transform {
-                            translation: bevy::math::vec2(Into::<f32>::into(x), Into::<f32>::into(y)).extend(0.0),
+                            translation: bevy::math::vec2(
+                                Into::<f32>::into(x),
+                                Into::<f32>::into(y),
+                            )
+                            .extend(0.0),
                             //s cale: Vec3::new(width as f32, height as f32, 1.0),
                             ..default()
                         });
@@ -65,13 +66,14 @@ pub fn pawn_spawn(
                         //sprite.color = color;
                     } else {
                         // the pawn didn't have a sprite so create one
-                        commands
-                            .entity(pawn_id)
-                            .insert(Sprite { 
-                                color,
-                                custom_size: Some(bevy::math::vec2(Into::<f32>::into(width), Into::<f32>::into(height))),
-                                ..default()
-                            });
+                        commands.entity(pawn_id).insert(Sprite {
+                            color,
+                            custom_size: Some(bevy::math::vec2(
+                                Into::<f32>::into(width),
+                                Into::<f32>::into(height),
+                            )),
+                            ..default()
+                        });
                     }
                     //sprite.color = color;
                 }
@@ -82,13 +84,17 @@ pub fn pawn_spawn(
                 }
                 // the entity didn't have a pawn so create one
                 let transform = Transform {
-                    translation: bevy::math::vec2(Into::<f32>::into(x), Into::<f32>::into(y)).extend(0.0),
+                    translation: bevy::math::vec2(Into::<f32>::into(x), Into::<f32>::into(y))
+                        .extend(0.0),
                     //s cale: Vec3::new(width as f32, height as f32, 1.0),
                     ..default()
                 };
-                let sprite = Sprite { 
+                let sprite = Sprite {
                     color,
-                    custom_size: Some(bevy::math::vec2(Into::<f32>::into(width), Into::<f32>::into(height))), 
+                    custom_size: Some(bevy::math::vec2(
+                        Into::<f32>::into(width),
+                        Into::<f32>::into(height),
+                    )),
                     ..default()
                 };
                 let pawn_id = commands.spawn((sprite, transform)).id();

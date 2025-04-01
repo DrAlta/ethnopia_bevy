@@ -1,7 +1,15 @@
+use crate::systems::{FindInInventoryRequest, agent::AgentState};
 use bevy::prelude::*;
-use ethnolib::{sandbox::{actions::{GotoRequest, UseOnRequest}, ai::{StackItem, Status, CPU}, world::Movement}, vec2, Number};
+use ethnolib::{
+    Number,
+    sandbox::{
+        actions::{GotoRequest, UseOnRequest},
+        ai::{CPU, StackItem, Status},
+        world::Movement,
+    },
+    vec2,
+};
 use std::hash::{DefaultHasher, Hash, Hasher};
-use crate::systems::{agent::AgentState, FindInInventoryRequest};
 
 pub fn handle_prayer(
     agent_id: Entity,
@@ -11,8 +19,8 @@ pub fn handle_prayer(
     find_in_inventory_requests: &mut EventWriter<FindInInventoryRequest>,
     use_on_requests: &mut EventWriter<UseOnRequest>,
     state: &mut AgentState,
-) -> (){
-            let salt = 0;
+) -> () {
+    let salt = 0;
     match ok {
         Status::Success => todo!(),
         Status::Failure => todo!(),
@@ -58,12 +66,12 @@ pub fn handle_prayer(
                 ethnolib::sandbox::ai::InpulseId::Act3 => todo!(),
                 ethnolib::sandbox::ai::InpulseId::GoTo => {
                     if let Some(StackItem::Coord{ x, y }) = cpu.stack.pop() {
-                        let movement = Movement{ 
+                        let movement = Movement{
                             target: vec2(
                                 Into::<Number>::into(x),
                                 Into::<Number>::into(y),
                             ),
-                            speed: Number::FIVE 
+                            speed: Number::FIVE
                         };
                         let salt = 0;
                         let mut s = DefaultHasher::new();
@@ -72,7 +80,7 @@ pub fn handle_prayer(
                         agent_id.hash(&mut s);
                         movement.hash(&mut s);
                         let action_id = s.finish();
-                        goto_requests.send(GotoRequest { 
+                        goto_requests.send(GotoRequest {
                             action_id,
                             agent_id,
                             movement,
@@ -84,11 +92,9 @@ pub fn handle_prayer(
                 ethnolib::sandbox::ai::InpulseId::Take => todo!(),
                 ethnolib::sandbox::ai::InpulseId::Use => todo!(),
                 ethnolib::sandbox::ai::InpulseId::EatClass(_food_class) => {
-                    
                 },
             }
         },
         Status::None => todo!(),
     }
-
 }
