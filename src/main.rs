@@ -4,12 +4,10 @@
 //!
 //! the AI system process the agents and if a agent is is waitng for world_pull result then it's counter is incremented then a check ot see if it's been to long and the instruction should fail.
 //!  if the agent isn't waiting it ticks the agent's AI
-use agent::agent_system;
 use bevy::{
     color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, RED, STEEL_BLUE, TAN, YELLOW},
     prelude::*,
 };
-use dev_comsole::collision_report_system;
 use ethnolib::{
     sandbox::{
         actions::{goto_system, use_object_system, PosibleActionsRequest, PosibleActionsResponce, UseOnRequest, UseRequest}, change_request::{
@@ -18,15 +16,15 @@ use ethnolib::{
     }, Number,
 };
 
-mod agent;
-mod dev_comsole;
+mod dev_console;
+use dev_console::collision_report_system;
+pub mod systems;
+use systems::{agent_system, cache_inventory_system, find_in_inventory_system, salt_system, Salt};
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
 //mod picking;
 //use picking::{cursor_hovering_system, CursorOnPawn, Picky};
-mod salt;
 mod picking2;
-pub use salt::{Salt,  salt_system};
 mod ui;
 
 const CELL_SIZE: Number = Number::new(30, 1);
@@ -55,14 +53,29 @@ fn main() {
             Update,
             (
                 salt_system,
+                // do the world simulation
+                // movement systems
                 process_movement,
                 collision_report_system,
                 (
+                    // action systems
                     use_object_system,
-                    change_request_system
-                ).chain(),
-                goto_system,
+                ),
+                // resolve the changes that actions wanted to have on the world
+                change_request_system,
+                // world sim finished
+                (
+                    // build caches
+                    cache_inventory_system
+                ),
+                (
+                    // answer prayers
+                    goto_system,
+                    find_in_inventory_system,
+                ),
+                // run AI
                 agent_system,
+                // UI
                 pawn_spawn,
                 picking2::picking_system,
                 picking2::hover_out_system,
