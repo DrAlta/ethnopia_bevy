@@ -1,5 +1,5 @@
 use bevy::{color::palettes::css::PINK, picking::focus::HoverMap, prelude::*};
-use ethnolib::sandbox::actions::PosibleActionsResponce;
+use ethnolib::sandbox::PosibleActionsResponce;
 use qol::logy;
 
 use crate::pawn_spawn::Pawn;

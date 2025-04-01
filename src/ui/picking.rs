@@ -3,7 +3,8 @@ use std::collections::HashMap;
 use bevy::prelude::*;
 
 use ethnolib::sandbox::{
-    actions::{PosibleActionsRequest, UseRequest},
+    actions::UseRequest,
+    PosibleActionsRequest,
     world::Type,
 };
 use qol::logy;

@@ -5,36 +5,28 @@
 //! the AI system process the agents and if a agent is is waitng for world_pull result then it's counter is incremented then a check ot see if it's been to long and the instruction should fail.
 //!  if the agent isn't waiting it ticks the agent's AI
 use bevy::{
-    color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, RED, STEEL_BLUE, TAN, YELLOW},
-    prelude::*,
+    color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, RED, STEEL_BLUE, TAN, YELLOW}, prelude::*
 };
 use ethnolib::{
-    Number,
     sandbox::{
-        Collision, Location, TravelCompleted,
         actions::{
-            PosibleActionsRequest, PosibleActionsResponce, UseOnRequest, UseRequest, goto_system,
-            use_object_system,
-        },
-        change_request::{
-            ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest,
-            ChangeSpawnLocationType, change_request_system,
-        },
-        process_movement,
-        world::{Energy, Hp, Item, Size, Type},
-    },
+            goto_system, use_object_system, ActionResult, GotoRequest, UseOnRequest, UseRequest
+        }, change_request::{
+            change_request_system, ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest, ChangeSpawnLocationType
+        }, process_movement, world::{Energy, Hp, Item, Size, Type}, Collision, Location, PosibleActionsRequest, PosibleActionsResponce, TravelCompleted
+    }, Number
 };
 
 mod dev_console;
 use dev_console::collision_report_system;
 pub mod systems;
-use systems::{Salt, agent_system, cache_inventory_system, find_in_inventory_system, salt_system};
+use systems::{agent_system, cache_inventory_system, find_in_inventory_system, salt_system, FindInInventoryRequest, FindInInventoryResult, Salt};
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
 //mod picking;
 //use picking::{cursor_hovering_system, CursorOnPawn, Picky};
-mod picking2;
 mod ui;
+use ui::{hover_out_system, picking_system};
 
 const CELL_SIZE: Number = Number::new(30, 1);
 
@@ -48,18 +40,29 @@ fn main() {
             actions: Vec::new(),
         })
         .add_systems(Startup, setup)
-        .add_event::<UseRequest>()
-        .add_event::<UseOnRequest>()
-        .add_event::<PosibleActionsRequest>()
-        .add_event::<PosibleActionsResponce>()
+        // movement
         .add_event::<TravelCompleted>()
         .add_event::<Collision>()
+        // actions
+        .add_event::<GotoRequest>()
+        .add_event::<UseRequest>()
+        .add_event::<UseOnRequest>()
+        // action results
+        .add_event::<ActionResult>()
+        // posible actions
+        .add_event::<PosibleActionsRequest>()
+        .add_event::<PosibleActionsResponce>()
+        // changes
         .add_event::<ChangeRequest>()
         .add_event::<ChangeConflict>()
         .add_event::<ChangeDespawn>()
         .add_event::<ChangeEnergy>()
         .add_event::<ChangeHp>()
         .add_event::<ChangeSpawnLocationType>()
+        // prayers
+        .add_event::<FindInInventoryRequest>()
+        .add_event::<FindInInventoryResult>()
+        // ui
         .add_event::<ui::UISelect>()
         .add_systems(
             Update,
@@ -89,8 +92,8 @@ fn main() {
                 agent_system,
                 // UI
                 pawn_spawn,
-                picking2::picking_system,
-                picking2::hover_out_system,
+                picking_system,
+                hover_out_system,
                 ui::ui_system,
             )
                 .chain(),
