@@ -1,6 +1,5 @@
 use crate::systems::{
-    FindInInventoryRequest,
-    agent::{Agent, AgentState, handle_prayer},
+    agent::{handle_prayer, Agent, AgentState}, FindInInventoryRequest, FindInInventoryResult
 };
 use bevy::prelude::*;
 use ethnolib::sandbox::{
@@ -10,17 +9,18 @@ use ethnolib::sandbox::{
 
 pub fn agent_system(
     mut query: Query<(Entity, &mut Agent)>,
-    mut action_result: EventReader<ActionResult>,
+    mut action_results: EventReader<ActionResult>,
+    mut find_in_inventory_results: EventReader<FindInInventoryResult>,
     mut goto_requests: EventWriter<GotoRequest>,
-    mut find_in_inventory_requests: EventWriter<FindInInventoryRequest>,
-    mut use_on_requests: EventWriter<UseOnRequest>,
+    mut find_in_inventory_request: EventWriter<FindInInventoryRequest>,
+    mut use_on_request: EventWriter<UseOnRequest>,
     mut commands: Commands,
 ) {
     for ActionResult {
         agent_id,
-        action_id,
+        prayer_id,
         result,
-    } in action_result.read()
+    } in action_results.read()
     {
         let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
             continue;
@@ -29,7 +29,7 @@ pub fn agent_system(
             continue;
         };
 
-        if action_waiting_for_id == action_id {
+        if action_waiting_for_id == prayer_id {
             let result = match result {
                 ethnolib::sandbox::actions::Result::Success => StackItem::success(),
                 ethnolib::sandbox::actions::Result::Failure => StackItem::failure(),
@@ -40,6 +40,31 @@ pub fn agent_system(
             commands.entity(*agent_id).remove::<ActionResult>();
         }
     }
+
+// handle FindInInventory prays being answered
+    for FindInInventoryResult { 
+        agent_id,
+        prayer_id,
+        found_item_id_maybe
+    } in find_in_inventory_results.read()
+    {
+        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
+            continue;
+        };
+        let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
+            continue;
+        };
+
+        if action_waiting_for_id == prayer_id {
+            let result = found_item_id_maybe.into();
+            agent.cpu.stack.push(result);
+            agent.state = AgentState::Running;
+
+            commands.entity(*agent_id).remove::<ActionResult>();
+        }
+    }
+
+
 
     for (agent_id, mut agent) in &mut query {
         let Agent {
@@ -56,14 +81,14 @@ pub fn agent_system(
                         ok,
                         cpu,
                         &mut goto_requests,
-                        &mut find_in_inventory_requests,
-                        &mut use_on_requests,
+                        &mut find_in_inventory_request,
+                        &mut use_on_request,
                         state,
                     );
                 }
                 Err(_) => todo!(),
             },
-            AgentState::WaitForAction(_action_id) => continue,
+            AgentState::WaitForAction(_prayer_id) => continue,
         }
     }
 }

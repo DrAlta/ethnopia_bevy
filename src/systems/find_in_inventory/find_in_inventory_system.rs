@@ -13,8 +13,8 @@ pub fn find_in_inventory_system(
 ) {
     for FindInInventoryRequest {
         agent_id,
+        prayer_id,
         item_class,
-        action_id,
     } in requests.read()
     {
         // first we get the cache of the agent's inventory
@@ -33,14 +33,14 @@ pub fn find_in_inventory_system(
             // send the result of what we found
             results.send(FindInInventoryResult {
                 agent_id: *agent_id,
-                action_id: *action_id,
+                prayer_id: *prayer_id,
                 found_item_id_maybe,
             });
         } else {
             // agent_id did not have an inventory so re just responed that no item was found
             results.send(FindInInventoryResult {
                 agent_id: *agent_id,
-                action_id: *action_id,
+                prayer_id: *prayer_id,
                 found_item_id_maybe: None,
             });
         }

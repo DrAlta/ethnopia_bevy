@@ -30,8 +30,8 @@ pub fn handle_prayer(
             "FindInInventory".hash(&mut s);
             agent_id.hash(&mut s);
             item_class.hash(&mut s);
-            let action_id = s.finish();
-            let request = FindInInventoryRequest{action_id, agent_id, item_class};
+            let prayer_id = s.finish();
+            let request = FindInInventoryRequest{prayer_id, agent_id, item_class};
 
             find_in_inventory_requests.send(request);
         },
@@ -45,10 +45,10 @@ pub fn handle_prayer(
             tool_id.hash(&mut s);
             target_id.hash(&mut s);
             //movement.hash(&mut s);
-            let action_id = s.finish();
+            let prayer_id = s.finish();
 
             use_on_requests.send(request);
-            *state = AgentState::WaitForAction(action_id);
+            *state = AgentState::WaitForAction(prayer_id);
 
         },
         Status::FindNearest {../* x, y, item_class*/ } => todo!(),
@@ -79,13 +79,13 @@ pub fn handle_prayer(
                         "Goto".hash(&mut s);
                         agent_id.hash(&mut s);
                         movement.hash(&mut s);
-                        let action_id = s.finish();
+                        let prayer_id = s.finish();
                         goto_requests.send(GotoRequest {
-                            action_id,
                             agent_id,
+                            prayer_id,
                             movement,
                         });
-                        *state = AgentState::WaitForAction(action_id);
+                        *state = AgentState::WaitForAction(prayer_id);
                     }
                 },
                 ethnolib::sandbox::ai::InpulseId::Plant => todo!(),
