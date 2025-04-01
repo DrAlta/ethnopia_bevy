@@ -1,5 +1,6 @@
 use crate::systems::{
-    agent::{handle_prayer, Agent, AgentState}, FindInInventoryRequest, FindInInventoryResult
+    FindInInventoryRequest, FindInInventoryResult,
+    agent::{Agent, AgentState, handle_prayer},
 };
 use bevy::prelude::*;
 use ethnolib::sandbox::{
@@ -41,11 +42,11 @@ pub fn agent_system(
         }
     }
 
-// handle FindInInventory prays being answered
-    for FindInInventoryResult { 
+    // handle FindInInventory prays being answered
+    for FindInInventoryResult {
         agent_id,
         prayer_id,
-        found_item_id_maybe
+        found_item_id_maybe,
     } in find_in_inventory_results.read()
     {
         let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
@@ -63,8 +64,6 @@ pub fn agent_system(
             commands.entity(*agent_id).remove::<ActionResult>();
         }
     }
-
-
 
     for (agent_id, mut agent) in &mut query {
         let Agent {
