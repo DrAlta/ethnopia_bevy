@@ -40,7 +40,6 @@ pub fn ui_system(
     let Some(thing) = select else {
         let mut text = text_query.single_mut();
         let x = hover_map.iter().next().unwrap().1.keys();
-        println!("updating text");
         text.0 = format!("{:?}{}", x, match ui_state.mode {
             Mode::Pan => "P",
             Mode::Move => "M",
