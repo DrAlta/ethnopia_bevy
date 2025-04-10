@@ -11,8 +11,9 @@ use bevy::{
 use ethnolib::{
     Number,
     sandbox::{
-        Collision, Location, TravelCompleted, process_movement,
-        world::{Energy, Hp, Item, Size, Type},
+        movement::Collision, Location,
+        world::{Energy, Hp, Size, Type},
+        Item, 
     },
 };
 
@@ -25,6 +26,7 @@ use crate::systems::{
         ChangeSpawnLocationType, change_request_system,
     },
     posible_actions::{PosibleActionsRequest, PosibleActionsResponce},
+    movement::{ TravelCompleted, process_movement}
 };
 
 mod dev_console;

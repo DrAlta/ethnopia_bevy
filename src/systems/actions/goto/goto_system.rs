@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 use qol::logy;
 
-use ethnolib::sandbox::{Collision, TravelCompleted, world::Movement};
+use ethnolib::sandbox::{movement::Collision, world::Movement};
 
-use crate::systems::actions::{ActionResult, GotoRequest, Result};
+use crate::systems::{actions::{ActionResult, GotoRequest, Result}, movement::TravelCompleted};
 
 #[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MovementRequest {

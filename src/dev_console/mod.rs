@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use ethnolib::sandbox::Collision;
+use ethnolib::sandbox::movement::Collision;
 use qol::logy;
 
 pub fn collision_report_system(mut events: EventReader<Collision>) {

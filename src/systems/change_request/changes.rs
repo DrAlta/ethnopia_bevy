@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use macros::Structs;
+use ethnopia_macros::Structs;
 
 use crate::systems::change_request::Dispatch;
 use ethnolib::sandbox::{EntityId, Item, Location};

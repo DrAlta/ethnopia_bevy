@@ -1875,24 +1875,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "ethnopia-macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "ethnopia_bevy"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "ethnopia-macros",
  "ethnopians",
  "log",
- "macros",
  "qol",
 ]
 
 [[package]]
 name = "ethnopians"
-version = "0.2.5"
+version = "0.3.0"
+source = "git+https://github.com/DrAlta/ethnopians.git?branch=bevy#4d3aa5581be8babc4dfdd51bfc476986af73467f"
 dependencies = [
  "base64 0.22.1",
- "bevy",
  "derive_more",
  "fraction64",
+ "macros",
  "nom",
  "ordered-f32",
  "qol",
@@ -2588,6 +2598,7 @@ dependencies = [
 [[package]]
 name = "macros"
 version = "0.1.0"
+source = "git+https://github.com/DrAlta/ethnopians.git?branch=bevy#4d3aa5581be8babc4dfdd51bfc476986af73467f"
 dependencies = [
  "proc-macro2",
  "quote",
