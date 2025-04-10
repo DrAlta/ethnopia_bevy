@@ -5,19 +5,24 @@
 //! the AI system process the agents and if a agent is is waitng for world_pull result then it's counter is incremented then a check ot see if it's been to long and the instruction should fail.
 //!  if the agent isn't waiting it ticks the agent's AI
 use bevy::{
-    color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, RED, STEEL_BLUE, TAN, YELLOW}, prelude::*
+    color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, RED, STEEL_BLUE, TAN, YELLOW},
+    prelude::*,
 };
 use ethnolib::{
-    sandbox::{process_movement, world::{Energy, Hp, Item, Size, Type}, Collision, Location, TravelCompleted
-    }, Number
+    Number,
+    sandbox::{
+        Collision, Location, TravelCompleted, process_movement,
+        world::{Energy, Hp, Item, Size, Type},
+    },
 };
 
 use crate::systems::{
     actions::{
-        goto_system, use_object_system, ActionResult, GotoRequest, UseOnRequest, UseRequest
-    }, 
+        ActionResult, GotoRequest, UseOnRequest, UseRequest, goto_system, use_object_system,
+    },
     change_request::{
-        change_request_system, ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest, ChangeSpawnLocationType
+        ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest,
+        ChangeSpawnLocationType, change_request_system,
     },
     posible_actions::{PosibleActionsRequest, PosibleActionsResponce},
 };
@@ -25,7 +30,10 @@ use crate::systems::{
 mod dev_console;
 use dev_console::collision_report_system;
 pub mod systems;
-use systems::{agent_system, cache_inventory_system, find_in_inventory_system, salt_system, FindInInventoryRequest, FindInInventoryResult, Salt};
+use systems::{
+    FindInInventoryRequest, FindInInventoryResult, Salt, agent_system, cache_inventory_system,
+    find_in_inventory_system, salt_system,
+};
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
 //mod picking;

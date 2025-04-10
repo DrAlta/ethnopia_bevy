@@ -1,9 +1,12 @@
-use crate::systems::{agent::AgentState, actions::{DropRequest, GotoRequest, UseOnRequest}, FindInInventoryRequest};
+use crate::systems::{
+    FindInInventoryRequest,
+    actions::{DropRequest, GotoRequest, UseOnRequest},
+    agent::AgentState,
+};
 use bevy::prelude::*;
 use ethnolib::{
     Number,
     sandbox::{
-    
         ai::{CPU, StackItem, Status},
         world::Movement,
     },

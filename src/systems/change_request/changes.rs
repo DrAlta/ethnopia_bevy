@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use macros::Structs;
 
-use ethnolib::sandbox::{EntityId, Item, Location};
 use crate::systems::change_request::Dispatch;
+use ethnolib::sandbox::{EntityId, Item, Location};
 
 //use super::dispatch::Dispatch2;
 

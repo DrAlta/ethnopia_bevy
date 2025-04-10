@@ -1,10 +1,10 @@
 mod action_result;
 pub use action_result::{ActionResult, Result};
 mod drop;
-pub use drop::{drop_system, DropRequest};
+pub use drop::{DropRequest, drop_system};
 mod goto;
-pub use goto::{goto_system, GotoRequest};
+pub use goto::{GotoRequest, goto_system};
 mod use_object;
-pub use use_object::{use_object_system, UseRequest};
+pub use use_object::{UseRequest, use_object_system};
 mod use_on;
-pub use use_on::{use_on_system, UseOnRequest};
+pub use use_on::{UseOnRequest, use_on_system};

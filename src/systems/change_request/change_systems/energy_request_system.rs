@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use qol::logy;
 
-use ethnolib::sandbox::world::Energy;
 use crate::systems::change_request::ChangeEnergy;
+use ethnolib::sandbox::world::Energy;
 
 pub fn energy_request_system(
     mut query: Query<&mut Energy>,

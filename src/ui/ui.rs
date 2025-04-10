@@ -1,7 +1,7 @@
 use bevy::{color::palettes::css::PINK, picking::focus::HoverMap, prelude::*};
 use qol::logy;
 
-use crate::{systems::posible_actions::PosibleActionsResponce, pawn_spawn::Pawn};
+use crate::{pawn_spawn::Pawn, systems::posible_actions::PosibleActionsResponce};
 #[allow(dead_code)]
 #[derive(Debug)]
 pub enum Mode {

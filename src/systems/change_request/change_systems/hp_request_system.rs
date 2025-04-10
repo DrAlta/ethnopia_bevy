@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use qol::logy;
 
-use ethnolib::sandbox::world::Hp;
 use crate::systems::change_request::ChangeHp;
+use ethnolib::sandbox::world::Hp;
 
 pub fn hp_request_system(mut query: Query<&mut Hp>, mut requests: EventReader<ChangeHp>) {
     for ChangeHp { entity_id, delta } in requests.read() {

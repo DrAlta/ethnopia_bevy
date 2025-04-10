@@ -1,5 +1,7 @@
 use crate::systems::{
-    agent::{handle_prayer, Agent, AgentState}, actions::{self, ActionResult, DropRequest, GotoRequest, UseOnRequest}, FindInInventoryRequest, FindInInventoryResult
+    FindInInventoryRequest, FindInInventoryResult,
+    actions::{self, ActionResult, DropRequest, GotoRequest, UseOnRequest},
+    agent::{Agent, AgentState, handle_prayer},
 };
 use bevy::prelude::*;
 use ethnolib::sandbox::ai::StackItem;
@@ -8,12 +10,12 @@ pub fn agent_system(
     mut query: Query<(Entity, &mut Agent)>,
     mut action_results: EventReader<ActionResult>,
     mut find_in_inventory_results: EventReader<FindInInventoryResult>,
-    
+
     mut drop_request: EventWriter<DropRequest>,
     mut goto_request: EventWriter<GotoRequest>,
     mut find_in_inventory_request: EventWriter<FindInInventoryRequest>,
     mut use_on_request: EventWriter<UseOnRequest>,
-    
+
     mut commands: Commands,
 ) {
     for ActionResult {

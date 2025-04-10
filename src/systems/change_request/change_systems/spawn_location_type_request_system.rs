@@ -5,7 +5,6 @@ use ethnolib::sandbox::world::Type;
 
 use crate::systems::change_request::ChangeSpawnLocationType;
 
-
 pub fn spawn_location_type_request_system(
     mut requests: EventReader<ChangeSpawnLocationType>,
     mut commands: Commands,

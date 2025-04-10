@@ -3,12 +3,11 @@ use std::collections::BTreeSet;
 use bevy::prelude::*;
 
 use ethnolib::{
-    sandbox::{
-        within_range,
-        world::{Energy, Size, Type},
-        EntityId, Item, Location, MAX_ENERGY,
-    },
     Number,
+    sandbox::{
+        EntityId, Item, Location, MAX_ENERGY, within_range,
+        world::{Energy, Size, Type},
+    },
 };
 
 use crate::systems::change_request::Changes;
@@ -139,23 +138,17 @@ pub fn use_object(
             }) else {
                 return Err("Agent doesn't have an axe!".to_owned());
             };
-            let changes = vec![
-                Changes::Despawn(object_id),
-                Changes::SpawnLocationType {
-                    location: Location::Inventory(agent_id),
-                    tyep: Item::Wood,
-                },
-            ];
+            let changes = vec![Changes::Despawn(object_id), Changes::SpawnLocationType {
+                location: Location::Inventory(agent_id),
+                tyep: Item::Wood,
+            }];
             return Ok((BTreeSet::from([object_id]), changes));
         }
         Item::Veggie => {
-            let changes = vec![
-                Changes::Despawn(object_id),
-                Changes::SpawnLocationType {
-                    location: Location::Inventory(agent_id),
-                    tyep: Item::Food,
-                },
-            ];
+            let changes = vec![Changes::Despawn(object_id), Changes::SpawnLocationType {
+                location: Location::Inventory(agent_id),
+                tyep: Item::Food,
+            }];
             return Ok((BTreeSet::from([object_id]), changes));
         }
     }

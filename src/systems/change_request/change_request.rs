@@ -2,7 +2,7 @@ use std::collections::BTreeSet;
 
 use bevy::prelude::*;
 
-use crate::systems::change_request::Changes; 
+use crate::systems::change_request::Changes;
 use ethnolib::sandbox::EntityId;
 
 #[derive(Event, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]

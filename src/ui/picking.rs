@@ -2,17 +2,12 @@ use std::collections::HashMap;
 
 use bevy::prelude::*;
 
-use ethnolib::sandbox::{
-    world::Type,
-};
+use ethnolib::sandbox::world::Type;
 use qol::logy;
 
 use crate::{
-    systems::{
-        actions::UseRequest,
-        posible_actions::PosibleActionsRequest,    
-    },
     pawn_spawn::Pawn,
+    systems::{actions::UseRequest, posible_actions::PosibleActionsRequest},
     ui::{Mode, UISelect, UIState},
 };
 

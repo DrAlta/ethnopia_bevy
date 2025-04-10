@@ -1,10 +1,7 @@
 use bevy::prelude::*;
 use qol::logy;
 
-use ethnolib::sandbox::{
-    world::Movement,
-    Collision, TravelCompleted,
-};
+use ethnolib::sandbox::{Collision, TravelCompleted, world::Movement};
 
 use crate::systems::actions::{ActionResult, GotoRequest, Result};
 

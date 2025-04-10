@@ -5,17 +5,16 @@ use qol::logy;
 
 use ethnolib::{
     sandbox::{
-        world::{Energy, Size, Type},
         Location,
+        world::{Energy, Size, Type},
     },
     types::ActionId,
 };
 
 use crate::systems::{
-    actions::use_object::{use_object, UseRequest},
+    actions::use_object::{UseRequest, use_object},
     change_request::ChangeRequest,
     posible_actions::{PosibleActionsRequest, PosibleActionsResponce},
-
 };
 
 pub fn use_object_system(

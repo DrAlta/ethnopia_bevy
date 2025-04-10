@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use ethnolib::sandbox::{world::Movement, EntityId};
+use ethnolib::sandbox::{EntityId, world::Movement};
 
 #[derive(Event, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct GotoRequest {

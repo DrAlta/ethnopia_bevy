@@ -3,12 +3,11 @@ use std::collections::BTreeSet;
 use bevy::prelude::*;
 
 use ethnolib::{
-    sandbox::{
-        within_range,
-        world::{Size, Type},
-        EntityId, Item, Location,
-    },
     Number,
+    sandbox::{
+        EntityId, Item, Location, within_range,
+        world::{Size, Type},
+    },
 };
 
 use crate::systems::change_request::Changes;
@@ -227,13 +226,10 @@ pub fn use_on(
             if tool_type != &Item::Axe {
                 return Err("Only an axe can be used on a Tree!".to_owned());
             };
-            let changes = vec![
-                Changes::Despawn(target_id),
-                Changes::SpawnLocationType {
-                    location: Location::Inventory(agent_id),
-                    tyep: Item::Wood,
-                },
-            ];
+            let changes = vec![Changes::Despawn(target_id), Changes::SpawnLocationType {
+                location: Location::Inventory(agent_id),
+                tyep: Item::Wood,
+            }];
             return Ok((BTreeSet::from([target_id]), changes));
         }
         Item::Veggie => {

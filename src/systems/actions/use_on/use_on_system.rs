@@ -3,17 +3,15 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use bevy::prelude::*;
 use qol::logy;
 
-use ethnolib::
-    sandbox::{
-        world::{Size, Type},
-        Location,
+use ethnolib::sandbox::{
+    Location,
+    world::{Size, Type},
 };
 
 use crate::systems::{
-    actions::use_on::{use_on, UseOnRequest},
-    change_request::ChangeRequest
+    actions::use_on::{UseOnRequest, use_on},
+    change_request::ChangeRequest,
 };
-
 
 pub fn use_on_system(
     query: Query<(Entity, &Type, &Location, Option<&Size>)>,
