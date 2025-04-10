@@ -1,9 +1,9 @@
-use crate::systems::{FindInInventoryRequest, agent::AgentState};
+use crate::systems::{agent::AgentState, actions::{DropRequest, GotoRequest, UseOnRequest}, FindInInventoryRequest};
 use bevy::prelude::*;
 use ethnolib::{
     Number,
     sandbox::{
-        actions::{GotoRequest, UseOnRequest},
+    
         ai::{CPU, StackItem, Status},
         world::Movement,
     },
@@ -15,9 +15,10 @@ pub fn handle_prayer(
     agent_id: Entity,
     ok: Status,
     cpu: &mut CPU,
-    goto_requests: &mut EventWriter<GotoRequest>,
-    find_in_inventory_requests: &mut EventWriter<FindInInventoryRequest>,
-    use_on_requests: &mut EventWriter<UseOnRequest>,
+    drop_request: &mut EventWriter<DropRequest>,
+    goto_request: &mut EventWriter<GotoRequest>,
+    find_in_inventory_request: &mut EventWriter<FindInInventoryRequest>,
+    use_on_request: &mut EventWriter<UseOnRequest>,
     state: &mut AgentState,
 ) -> () {
     let salt = 0;
@@ -33,7 +34,7 @@ pub fn handle_prayer(
             let prayer_id = s.finish();
             let request = FindInInventoryRequest{prayer_id, agent_id, item_class};
 
-            find_in_inventory_requests.send(request);
+            find_in_inventory_request.send(request);
         },
         Status::UseOn(tool_id, target_id) => {
             let request = UseOnRequest{ agent_id, tool_id, target_id };
@@ -47,7 +48,7 @@ pub fn handle_prayer(
             //movement.hash(&mut s);
             let prayer_id = s.finish();
 
-            use_on_requests.send(request);
+            use_on_request.send(request);
             *state = AgentState::WaitForAction(prayer_id);
 
         },
@@ -73,14 +74,13 @@ pub fn handle_prayer(
                             ),
                             speed: Number::FIVE
                         };
-                        let salt = 0;
                         let mut s = DefaultHasher::new();
                         salt.hash(&mut s);
                         "Goto".hash(&mut s);
                         agent_id.hash(&mut s);
                         movement.hash(&mut s);
                         let prayer_id = s.finish();
-                        goto_requests.send(GotoRequest {
+                        goto_request.send(GotoRequest {
                             agent_id,
                             prayer_id,
                             movement,
@@ -88,9 +88,27 @@ pub fn handle_prayer(
                         *state = AgentState::WaitForAction(prayer_id);
                     }
                 },
-                ethnolib::sandbox::ai::InpulseId::Plant => todo!(),
+                ethnolib::sandbox::ai::InpulseId::Plant => {
+                    let Some(StackItem::EntityId(object_id)) = cpu.stack.pop() else {
+                        cpu.stack.push(StackItem::failure());
+                        *state = AgentState::Running;
+                        return
+                    };
+                    let mut s = DefaultHasher::new();
+                    salt.hash(&mut s);
+                    "Plant".hash(&mut s);
+                    agent_id.hash(&mut s);
+                    object_id.hash(&mut s);
+                    let prayer_id = s.finish();
+
+                    drop_request.send(DropRequest{ agent_id, prayer_id, object_id });
+
+                    *state = AgentState::WaitForAction(prayer_id);
+
+                },
                 ethnolib::sandbox::ai::InpulseId::Take => todo!(),
                 ethnolib::sandbox::ai::InpulseId::Use => todo!(),
+                ethnolib::sandbox::ai::InpulseId::UseOn => todo!(),
                 ethnolib::sandbox::ai::InpulseId::EatClass(_food_class) => {
                 },
             }

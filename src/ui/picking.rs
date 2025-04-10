@@ -3,13 +3,15 @@ use std::collections::HashMap;
 use bevy::prelude::*;
 
 use ethnolib::sandbox::{
-    actions::UseRequest,
-    PosibleActionsRequest,
     world::Type,
 };
 use qol::logy;
 
 use crate::{
+    systems::{
+        actions::UseRequest,
+        posible_actions::PosibleActionsRequest,    
+    },
     pawn_spawn::Pawn,
     ui::{Mode, UISelect, UIState},
 };

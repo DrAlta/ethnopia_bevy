@@ -4,11 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+macros = {path = "./macros"}
 bevy = { version = "0.15.1", features = ["dynamic_linking"] }
 log = { version = "*", features = ["max_level_debug", "release_max_level_warn"] }
 qol = { version = "0.1.17", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
-#ethnopians = {path= "../ethnopians/", features = ["sandbox"], default-features = false}
-ethnopians = {git= "https://github.com/DrAlta/ethnopians.git", version = "0.2.4", branch = "bevy", features = ["sandbox"], default-features = false}
+ethnopians = {path= "../ethnopians/", features = ["sandbox"], default-features = false}
+#ethnopians = {git= "https://github.com/DrAlta/ethnopians.git", version = "0.2.4", branch = "bevy", features = ["sandbox"], default-features = false}
 
 
 # Enable a small amount of optimization in the dev profile.
@@ -24,3 +25,11 @@ default = ["debug", "error", "log"]
 debug = []
 error = []
 log = []
+trace-goto = []
+trace-req = ["trace-req-despawn", "trace-req-energy", "trace-req-hp", "trace-req-spawn-location-type"]
+trace-req-despawn = []
+trace-req-energy = []
+trace-req-hp = []
+trace-req-spawn-location-type = []
+trace-use-object = []
+trace-use-on = []

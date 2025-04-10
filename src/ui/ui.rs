@@ -1,8 +1,7 @@
 use bevy::{color::palettes::css::PINK, picking::focus::HoverMap, prelude::*};
-use ethnolib::sandbox::PosibleActionsResponce;
 use qol::logy;
 
-use crate::pawn_spawn::Pawn;
+use crate::{systems::posible_actions::PosibleActionsResponce, pawn_spawn::Pawn};
 #[allow(dead_code)]
 #[derive(Debug)]
 pub enum Mode {

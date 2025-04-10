@@ -8,13 +8,18 @@ use bevy::{
     color::palettes::css::{BLUE, BROWN, GRAY, GREEN, ORANGE, RED, STEEL_BLUE, TAN, YELLOW}, prelude::*
 };
 use ethnolib::{
-    sandbox::{
-        actions::{
-            goto_system, use_object_system, ActionResult, GotoRequest, UseOnRequest, UseRequest
-        }, change_request::{
-            change_request_system, ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest, ChangeSpawnLocationType
-        }, process_movement, world::{Energy, Hp, Item, Size, Type}, Collision, Location, PosibleActionsRequest, PosibleActionsResponce, TravelCompleted
+    sandbox::{process_movement, world::{Energy, Hp, Item, Size, Type}, Collision, Location, TravelCompleted
     }, Number
+};
+
+use crate::systems::{
+    actions::{
+        goto_system, use_object_system, ActionResult, GotoRequest, UseOnRequest, UseRequest
+    }, 
+    change_request::{
+        change_request_system, ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest, ChangeSpawnLocationType
+    },
+    posible_actions::{PosibleActionsRequest, PosibleActionsResponce},
 };
 
 mod dev_console;

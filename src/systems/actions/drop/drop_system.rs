@@ -1,5 +1,6 @@
 use bevy::prelude::*;
-use ethnolib::sandbox::{actions::ActionResult, Location};
+use ethnolib::sandbox::Location;
+use crate::systems::actions::{self, ActionResult};
 
 use super::DropRequest;
 
@@ -19,7 +20,7 @@ pub fn drop_system(
             result.send(ActionResult{ 
                 agent_id: *agent_id,
                 prayer_id: *prayer_id,
-                result: ethnolib::sandbox::actions::Result::Failure
+                result: actions::Result::Failure
             });
             continue
         };
@@ -27,7 +28,7 @@ pub fn drop_system(
             result.send(ActionResult{ 
                 agent_id: *agent_id,
                 prayer_id: *prayer_id,
-                result: ethnolib::sandbox::actions::Result::Failure
+                result: actions::Result::Failure
             });
             continue
         }
@@ -35,7 +36,7 @@ pub fn drop_system(
             result.send(ActionResult{ 
                 agent_id: *agent_id,
                 prayer_id: *prayer_id,
-                result: ethnolib::sandbox::actions::Result::Failure
+                result: actions::Result::Failure
             });
             continue
         };
@@ -43,7 +44,7 @@ pub fn drop_system(
         result.send(ActionResult{ 
             agent_id: *agent_id,
             prayer_id: *prayer_id,
-            result: ethnolib::sandbox::actions::Result::Success
+            result: actions::Result::Success
         });
     }
 }
