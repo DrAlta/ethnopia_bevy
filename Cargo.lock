@@ -1900,6 +1900,7 @@ version = "0.3.0"
 source = "git+https://github.com/DrAlta/ethnopians.git?branch=bevy#4d3aa5581be8babc4dfdd51bfc476986af73467f"
 dependencies = [
  "base64 0.22.1",
+ "bevy",
  "derive_more",
  "fraction64",
  "macros",

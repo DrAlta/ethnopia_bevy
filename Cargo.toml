@@ -9,7 +9,7 @@ bevy = { version = "0.15.1", features = ["dynamic_linking"] }
 log = { version = "*", features = ["max_level_debug", "release_max_level_warn"] }
 qol = { version = "0.1.17", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
 #ethnopians = {path= "../ethnopians/", features = ["sandbox", "bevy"], default-features = false}
-ethnopians = {git= "https://github.com/DrAlta/ethnopians.git", version = "0.3.0", branch = "bevy", features = ["sandbox"], default-features = false}
+ethnopians = {git= "https://github.com/DrAlta/ethnopians.git", version = "0.3.0", branch = "bevy", features = ["sandbox", "bevy"], default-features = false}
 
 
 # Enable a small amount of optimization in the dev profile.
