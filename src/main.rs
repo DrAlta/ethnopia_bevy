@@ -33,8 +33,7 @@ mod dev_console;
 use dev_console::collision_report_system;
 pub mod systems;
 use systems::{
-    FindInInventoryRequest, FindInInventoryResult, Salt, agent_system, cache_inventory_system,
-    find_in_inventory_system, salt_system,
+    agent_system, cache_inventory_system, find_in_inventory_system, salt_system, FindInInventoryRequest, FindInInventoryResult, Salt,
 };
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
@@ -48,6 +47,7 @@ const CELL_SIZE: Number = Number::new(30, 1);
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .insert_resource(systems::BVH(None))
         .insert_resource(Salt(0))
         .insert_resource(ui::UIState {
             selected_entity: None,
@@ -96,7 +96,8 @@ fn main() {
                 // world sim finished
                 (
                     // build caches
-                    cache_inventory_system
+                    cache_inventory_system,
+                    systems::bvh_system,
                 ),
                 (
                     // answer prayers

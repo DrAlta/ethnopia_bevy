@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use ethnolib::sandbox::world::Type;
 
 use crate::systems::{
-    cache_inventory::CacheInventory,
+    cache::CacheInventory,
     find_in_inventory::{FindInInventoryRequest, FindInInventoryResult},
 };
 

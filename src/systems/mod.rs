@@ -2,8 +2,8 @@
 pub mod actions;
 mod agent;
 pub use agent::agent_system;
-mod cache_inventory;
-pub use cache_inventory::{CacheInventory, cache_inventory_system};
+mod cache;
+pub use cache::{bvh_system, BVH, CacheInventory, cache_inventory_system};
 pub mod change_request;
 mod find_in_inventory;
 pub use find_in_inventory::{

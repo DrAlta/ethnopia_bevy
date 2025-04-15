@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use ethnolib::sandbox::Location;
 use qol::PushOrInsert;
 
-use crate::systems::cache_inventory::CacheInventory;
+use crate::systems::cache::cache_inventory::CacheInventory;
 
 pub fn cache_inventory_system(
     mut query: Query<(Entity, Option<&Location>, Option<&mut CacheInventory>)>,
