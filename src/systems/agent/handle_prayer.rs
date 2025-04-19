@@ -1,7 +1,5 @@
 use crate::systems::{
-    FindInInventoryRequest,
-    actions::{DropRequest, GotoRequest, UseOnRequest},
-    agent::AgentState,
+    actions::{DropRequest, GotoRequest, UseOnRequest}, agent::AgentState, FindInInventoryRequest, FindNearestRequest
 };
 use bevy::prelude::*;
 use ethnolib::{
@@ -12,6 +10,7 @@ use ethnolib::{
     },
     vec2,
 };
+use qol::placeholder;
 use std::hash::{DefaultHasher, Hash, Hasher};
 
 pub fn handle_prayer(
@@ -21,6 +20,8 @@ pub fn handle_prayer(
     drop_request: &mut EventWriter<DropRequest>,
     goto_request: &mut EventWriter<GotoRequest>,
     find_in_inventory_request: &mut EventWriter<FindInInventoryRequest>,
+    find_nearest_request: &mut EventWriter<FindNearestRequest>,
+
     use_on_request: &mut EventWriter<UseOnRequest>,
     state: &mut AgentState,
 ) -> () {
@@ -55,7 +56,20 @@ pub fn handle_prayer(
             *state = AgentState::WaitForAction(prayer_id);
 
         },
-        Status::FindNearest {../* x, y, item_class*/ } => todo!(),
+        Status::FindNearest { x, y, item_class } => {
+            let mut s = DefaultHasher::new();
+            salt.hash(&mut s);
+            "FindNearest".hash(&mut s);
+            agent_id.hash(&mut s);
+            x.hash(&mut s);
+            y.hash(&mut s);
+            item_class.hash(&mut s);
+            let prayer_id = s.finish();
+            let request = FindNearestRequest{ agent_id, prayer_id, min_radius: placeholder!(16 * 50), x, y };
+
+            find_nearest_request.send(request);
+
+        },
         Status::GetEnergy(_entity) => todo!(),
         Status::GetLocation(_entity) => todo!(),
         Status::GetHp(_entity) => todo!(),

@@ -41,6 +41,7 @@ use pawn_spawn::pawn_spawn;
 //use picking::{cursor_hovering_system, CursorOnPawn, Picky};
 mod ui;
 use ui::{hover_out_system, picking_system};
+pub use ui::menu;
 
 const CELL_SIZE: Number = Number::new(30, 1);
 
