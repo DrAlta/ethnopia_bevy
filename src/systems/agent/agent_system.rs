@@ -1,5 +1,7 @@
 use crate::systems::{
-    actions::{self, ActionResult, DropRequest, GotoRequest, UseOnRequest}, agent::{handle_prayer, Agent, AgentState}, FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult
+    actions::{self, ActionResult, DropRequest, GotoRequest, UseOnRequest},
+    agent::{Agent, AgentState, handle_prayer},
+    query::{FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult},
 };
 use bevy::prelude::*;
 use ethnolib::sandbox::ai::StackItem;
@@ -66,12 +68,12 @@ pub fn agent_system(
         }
     }
 
-
-    for FindNearestResult { 
+    for FindNearestResult {
         agent_id,
         prayer_id,
-        found_item_id_maybe
-    } in find_nearest_results.read() {
+        found_item_id_maybe,
+    } in find_nearest_results.read()
+    {
         let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
             continue;
         };
@@ -80,10 +82,11 @@ pub fn agent_system(
         };
 
         if action_waiting_for_id == prayer_id {
-            let result: StackItem = match found_item_id_maybe{
+            let result: StackItem = match found_item_id_maybe {
                 Some((x, _)) => Some(x),
                 None => None,
-            }.into();
+            }
+            .into();
             agent.cpu.stack.push(result);
             agent.state = AgentState::Running;
 

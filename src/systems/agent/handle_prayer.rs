@@ -1,5 +1,7 @@
 use crate::systems::{
-    actions::{DropRequest, GotoRequest, UseOnRequest}, agent::AgentState, FindInInventoryRequest, FindNearestRequest
+    actions::{DropRequest, GotoRequest, UseOnRequest},
+    agent::AgentState,
+    query::{FindInInventoryRequest, FindNearestRequest},
 };
 use bevy::prelude::*;
 use ethnolib::{

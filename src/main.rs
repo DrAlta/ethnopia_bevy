@@ -11,9 +11,9 @@ use bevy::{
 use ethnolib::{
     Number,
     sandbox::{
-        movement::Collision, Location,
+        Item, Location,
+        movement::Collision,
         world::{Energy, Hp, Size, Type},
-        Item, 
     },
 };
 
@@ -25,23 +25,25 @@ use crate::systems::{
         ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest,
         ChangeSpawnLocationType, change_request_system,
     },
+    movement::{TravelCompleted, process_movement},
     posible_actions::{PosibleActionsRequest, PosibleActionsResponce},
-    movement::{ TravelCompleted, process_movement}
 };
 
 mod dev_console;
 use dev_console::collision_report_system;
 pub mod systems;
 use systems::{
-    agent_system, cache_inventory_system, find_in_inventory_system, salt_system, FindInInventoryRequest, FindInInventoryResult, Salt,
+    Salt, agent_system, cache_inventory_system,
+    query::{FindInInventoryRequest, FindInInventoryResult, find_in_inventory_system},
+    salt_system,
 };
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
 //mod picking;
 //use picking::{cursor_hovering_system, CursorOnPawn, Picky};
 mod ui;
-use ui::{hover_out_system, picking_system};
 pub use ui::menu;
+use ui::{hover_out_system, picking_system};
 
 const CELL_SIZE: Number = Number::new(30, 1);
 

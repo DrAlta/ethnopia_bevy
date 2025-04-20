@@ -3,7 +3,10 @@ use qol::logy;
 
 use ethnolib::sandbox::{movement::Collision, world::Movement};
 
-use crate::systems::{actions::{ActionResult, GotoRequest, Result}, movement::TravelCompleted};
+use crate::systems::{
+    actions::{ActionResult, GotoRequest, Result},
+    movement::TravelCompleted,
+};
 
 #[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MovementRequest {

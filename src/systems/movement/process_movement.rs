@@ -5,17 +5,17 @@ use bevy::{
     prelude::{Commands, Query},
 };
 
-use ethnolib::{types::AARect, Number, IOTA};
+use ethnolib::{IOTA, Number, types::AARect};
 
 use qol::logy;
 
 use ethnolib::{
-    sandbox::{
-        movement::{moveit, setup_avals_map, Collision, Prev},
-        world::{Movement, Size},
-        EntityId, Location,
-    },
     Vec2,
+    sandbox::{
+        EntityId, Location,
+        movement::{Collision, Prev, moveit, setup_avals_map},
+        world::{Movement, Size},
+    },
 };
 
 use crate::systems::movement::TravelCompleted;

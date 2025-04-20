@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use ethnolib::{sandbox::EntityId, Number};
+use ethnolib::{Number, sandbox::EntityId};
 
 type SquaredDistance = Number;
 
