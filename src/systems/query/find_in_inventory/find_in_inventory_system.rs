@@ -3,7 +3,7 @@ use ethnolib::sandbox::world::Type;
 
 use crate::systems::{
     cache::CacheInventory,
-    find_in_inventory::{FindInInventoryRequest, FindInInventoryResult},
+    query::find_in_inventory::{FindInInventoryRequest, FindInInventoryResult},
 };
 
 pub fn find_in_inventory_system(

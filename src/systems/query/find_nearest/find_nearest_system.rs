@@ -4,7 +4,10 @@ use bevy::prelude::*;
 use ethnolib::{Number, sandbox::Location};
 use qol::{logy, placeholder};
 
-use crate::systems::{BVH, FindNearestRequest, FindNearestResult};
+use crate::systems::{
+    BVH,
+    query::{FindNearestRequest, FindNearestResult},
+};
 
 pub fn default_search_step() -> i32 {
     static DEFAULT_SEARCH_STEP: OnceLock<i32> = OnceLock::new();
