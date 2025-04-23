@@ -1,7 +1,10 @@
 use crate::systems::{
     actions::{self, ActionResult, DropRequest, GotoRequest, UseOnRequest},
     agent::{Agent, AgentState, handle_prayer},
-    query::{FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult},
+    query::{
+        FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult,
+        GetEnergyRequest, GetEnergyResult,
+    },
 };
 use bevy::prelude::*;
 use ethnolib::sandbox::ai::StackItem;
@@ -11,14 +14,15 @@ pub fn agent_system(
     mut action_results: EventReader<ActionResult>,
     mut find_in_inventory_results: EventReader<FindInInventoryResult>,
     mut find_nearest_results: EventReader<FindNearestResult>,
+    mut get_energy_result: EventReader<GetEnergyResult>,
 
     mut drop_request: EventWriter<DropRequest>,
     mut goto_request: EventWriter<GotoRequest>,
     mut find_in_inventory_request: EventWriter<FindInInventoryRequest>,
     mut find_nearest_request: EventWriter<FindNearestRequest>,
+    mut get_energy_request: EventWriter<GetEnergyRequest>,
     mut use_on_request: EventWriter<UseOnRequest>,
-
-    mut commands: Commands,
+    //mut commands: Commands,
 ) {
     for ActionResult {
         agent_id,
@@ -40,8 +44,6 @@ pub fn agent_system(
             };
             agent.cpu.stack.push(result);
             agent.state = AgentState::Running;
-
-            commands.entity(*agent_id).remove::<ActionResult>();
         }
     }
 
@@ -63,8 +65,6 @@ pub fn agent_system(
             let result = found_item_id_maybe.into();
             agent.cpu.stack.push(result);
             agent.state = AgentState::Running;
-
-            commands.entity(*agent_id).remove::<ActionResult>();
         }
     }
 
@@ -89,8 +89,26 @@ pub fn agent_system(
             .into();
             agent.cpu.stack.push(result);
             agent.state = AgentState::Running;
+        }
+    }
 
-            commands.entity(*agent_id).remove::<ActionResult>();
+    for GetEnergyResult {
+        agent_id,
+        prayer_id,
+        energy_maybe,
+    } in get_energy_result.read()
+    {
+        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
+            continue;
+        };
+        let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
+            continue;
+        };
+
+        if action_waiting_for_id == prayer_id {
+            let result: StackItem = energy_maybe.into();
+            agent.cpu.stack.push(result);
+            agent.state = AgentState::Running;
         }
     }
 
@@ -112,6 +130,7 @@ pub fn agent_system(
                         &mut goto_request,
                         &mut find_in_inventory_request,
                         &mut find_nearest_request,
+                        &mut get_energy_request,
                         &mut use_on_request,
                         state,
                     );

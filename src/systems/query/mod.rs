@@ -4,3 +4,5 @@ pub use find_in_inventory::{
 };
 mod find_nearest;
 pub use find_nearest::{FindNearestRequest, FindNearestResult, find_nearest_system};
+mod get_energy;
+pub use get_energy::{GetEnergyRequest, GetEnergyResult, get_energy_system};
