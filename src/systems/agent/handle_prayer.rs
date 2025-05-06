@@ -1,7 +1,7 @@
 use crate::systems::{
     actions::{DropRequest, GotoRequest, UseOnRequest},
     agent::AgentState,
-    query::{FindInInventoryRequest, FindNearestRequest, GetEnergyRequest},
+    query::{FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetLocationRequest},
 };
 use bevy::prelude::*;
 use ethnolib::{
@@ -24,6 +24,7 @@ pub fn handle_prayer(
     find_in_inventory_request: &mut EventWriter<FindInInventoryRequest>,
     find_nearest_request: &mut EventWriter<FindNearestRequest>,
     get_energy_request: &mut EventWriter<GetEnergyRequest>,
+    get_location_request: &mut EventWriter<GetLocationRequest>,
 
     use_on_request: &mut EventWriter<UseOnRequest>,
     state: &mut AgentState,
@@ -88,7 +89,19 @@ pub fn handle_prayer(
 
             *state = AgentState::WaitForAction(prayer_id);
         },
-        Status::GetLocation(_entity) => todo!(),
+        Status::GetLocation(subject_id) => {
+            let mut s = DefaultHasher::new();
+            salt.hash(&mut s);
+            "GetLocation".hash(&mut s);
+            agent_id.hash(&mut s);
+            subject_id.hash(&mut s);
+            let prayer_id = s.finish();
+            let request = GetLocationRequest{ agent_id, prayer_id, subject_id };
+
+            get_location_request.send(request);
+
+            *state = AgentState::WaitForAction(prayer_id);
+        },
         Status::GetHp(_entity) => todo!(),
         Status::GetIsInventoryGE { ../*agent, item_class, amount*/ } => todo!(),
         Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),

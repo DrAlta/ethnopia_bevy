@@ -33,9 +33,7 @@ mod dev_console;
 use dev_console::collision_report_system;
 pub mod systems;
 use systems::{
-    Salt, agent_system, cache_inventory_system,
-    query::{FindInInventoryRequest, FindInInventoryResult, find_in_inventory_system},
-    salt_system,
+    agent_system, cache_inventory_system, query::{find_in_inventory_system, find_nearest_system, get_energy_system, get_location_system, FindInInventoryRequest, FindInInventoryResult}, salt_system, Salt
 };
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
@@ -102,18 +100,27 @@ fn main() {
                     cache_inventory_system,
                     systems::bvh_system,
                 ),
+                // 'answer divination prayers' and 'run AI' should loop until 'run AI' stops generating new divination prayers(or some time out)
                 (
-                    // answer prayers
-                    goto_system,
+                    // answer divination prayers
                     find_in_inventory_system,
+                    find_nearest_system,
+                    get_energy_system,
+                    get_location_system,
                 ),
                 // run AI
                 agent_system,
+                // answer supplication prayers
+                (
+                    goto_system
+                ),
                 // UI
-                pawn_spawn,
-                picking_system,
-                hover_out_system,
-                ui::ui_system,
+                (
+                    pawn_spawn,
+                    picking_system,
+                    hover_out_system,
+                    ui::ui_system,
+                ).chain(),
             )
                 .chain(),
         )
