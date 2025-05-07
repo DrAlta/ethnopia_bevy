@@ -31,9 +31,11 @@ use crate::systems::{
 
 mod dev_console;
 use dev_console::collision_report_system;
+mod game_state;
+pub use game_state::GameState;
 pub mod systems;
 use systems::{
-    agent_system, cache_inventory_system, query::{find_in_inventory_system, find_nearest_system, get_energy_system, get_location_system, FindInInventoryRequest, FindInInventoryResult}, salt_system, Salt
+    agent_system, cache_inventory_system, query::{find_in_inventory_system, find_nearest_system, get_energy_system, get_hp_system, get_location_system, FindInInventoryRequest, FindInInventoryResult}, salt_system, Salt
 };
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
@@ -47,6 +49,7 @@ const CELL_SIZE: Number = Number::new(30, 1);
 
 fn main() {
     App::new()
+        .init_state::<GameState>()
         .add_plugins(DefaultPlugins)
         .insert_resource(systems::BVH(None))
         .insert_resource(Salt(0))
@@ -85,27 +88,31 @@ fn main() {
             (
                 salt_system,
                 // do the world simulation
-                // movement systems
-                process_movement,
-                collision_report_system,
                 (
-                    // action systems
-                    use_object_system,
-                ),
-                // resolve the changes that actions wanted to have on the world
-                change_request_system,
+                    // movement systems
+                    process_movement,
+                    collision_report_system,
+                    (
+                        // action systems
+                        use_object_system,
+                    ),
+                    // resolve the changes that actions wanted to have on the world
+                    change_request_system,
+                ).chain().run_if(in_state(GameState::RunningSimulation)),
                 // world sim finished
                 (
                     // build caches
                     cache_inventory_system,
                     systems::bvh_system,
-                ),
+                ).run_if(in_state(GameState::RunningSimulation)),
+                // start_ai_loop_system.run_if(in_state(GameState::RunningSimulation)),
                 // 'answer divination prayers' and 'run AI' should loop until 'run AI' stops generating new divination prayers(or some time out)
                 (
                     // answer divination prayers
                     find_in_inventory_system,
                     find_nearest_system,
                     get_energy_system,
+                    get_hp_system,
                     get_location_system,
                 ),
                 // run AI

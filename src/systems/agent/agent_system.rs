@@ -1,13 +1,13 @@
-use crate::systems::{
+use crate::{systems::{
     actions::{self, ActionResult, DropRequest, GotoRequest, UseOnRequest},
     agent::{handle_prayer, Agent, AgentState},
     query::{
-        FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult,
-        GetEnergyRequest, GetEnergyResult, GetLocationRequest, GetLocationResult,
+        FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult, GetEnergyRequest, GetEnergyResult, GetHpRequest, GetLocationRequest, GetLocationResult
     },
-};
+}, GameState};
 use bevy::prelude::*;
 use ethnolib::sandbox::{ai::StackItem, Location};
+
 
 pub fn agent_system(
     mut query: Query<(Entity, &mut Agent)>,
@@ -23,10 +23,16 @@ pub fn agent_system(
     mut find_in_inventory_request: EventWriter<FindInInventoryRequest>,
     mut find_nearest_request: EventWriter<FindNearestRequest>,
     mut get_energy_request: EventWriter<GetEnergyRequest>,
-    mut use_on_request: EventWriter<UseOnRequest>,
+    mut get_hp_request: EventWriter<GetHpRequest>,
     mut get_location_request: EventWriter<GetLocationRequest>,
+    mut use_on_request: EventWriter<UseOnRequest>,
+
+    state: Res<State<GameState>>,
+    mut next_state: ResMut<NextState<GameState>>,
     //mut commands: Commands,
 ) {
+    let mut made_world_query = false;
+    
     for ActionResult {
         agent_id,
         prayer_id,
@@ -150,6 +156,7 @@ pub fn agent_system(
             AgentState::Running => match cpu.step(bt, blackboard) {
                 Ok(ok) => {
                     handle_prayer(
+                        &mut made_world_query,
                         agent_id,
                         ok,
                         cpu,
@@ -158,6 +165,7 @@ pub fn agent_system(
                         &mut find_in_inventory_request,
                         &mut find_nearest_request,
                         &mut get_energy_request,
+                        &mut get_hp_request,
                         &mut get_location_request,
 
                         &mut use_on_request,
@@ -169,4 +177,15 @@ pub fn agent_system(
             AgentState::WaitForAction(_prayer_id) => continue,
         }
     }
+
+    if made_world_query {
+        let new_loop_count = if let GameState::SimulationPausedForAI(loop_count) = state.get() {
+            loop_count + 1
+        } else {
+            0
+        };
+        next_state.set(GameState::SimulationPausedForAI(new_loop_count));
+    } else {
+        next_state.set(GameState::RunningSimulation);
+    };
 }

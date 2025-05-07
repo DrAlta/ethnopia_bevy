@@ -1,7 +1,7 @@
 use crate::systems::{
     actions::{DropRequest, GotoRequest, UseOnRequest},
     agent::AgentState,
-    query::{FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetLocationRequest},
+    query::{FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetHpRequest, GetLocationRequest},
 };
 use bevy::prelude::*;
 use ethnolib::{
@@ -16,6 +16,8 @@ use qol::placeholder;
 use std::hash::{DefaultHasher, Hash, Hasher};
 
 pub fn handle_prayer(
+    made_world_query: &mut bool,
+
     agent_id: Entity,
     ok: Status,
     cpu: &mut CPU,
@@ -24,6 +26,7 @@ pub fn handle_prayer(
     find_in_inventory_request: &mut EventWriter<FindInInventoryRequest>,
     find_nearest_request: &mut EventWriter<FindNearestRequest>,
     get_energy_request: &mut EventWriter<GetEnergyRequest>,
+    get_hp_request: &mut EventWriter<GetHpRequest>,
     get_location_request: &mut EventWriter<GetLocationRequest>,
 
     use_on_request: &mut EventWriter<UseOnRequest>,
@@ -43,6 +46,8 @@ pub fn handle_prayer(
             let request = FindInInventoryRequest{prayer_id, agent_id, item_class};
 
             find_in_inventory_request.send(request);
+
+            *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
         },
         Status::UseOn(tool_id, target_id) => {
@@ -58,6 +63,8 @@ pub fn handle_prayer(
             let prayer_id = s.finish();
 
             use_on_request.send(request);
+            
+            *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
 
         },
@@ -74,6 +81,7 @@ pub fn handle_prayer(
 
             find_nearest_request.send(request);
 
+            *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
         },
         Status::GetEnergy(subject_id) => {
@@ -87,6 +95,7 @@ pub fn handle_prayer(
 
             get_energy_request.send(request);
 
+            *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
         },
         Status::GetLocation(subject_id) => {
@@ -100,9 +109,23 @@ pub fn handle_prayer(
 
             get_location_request.send(request);
 
+            *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
         },
-        Status::GetHp(_entity) => todo!(),
+        Status::GetHp(subject_id) => {
+            let mut s = DefaultHasher::new();
+            salt.hash(&mut s);
+            "GetLocation".hash(&mut s);
+            agent_id.hash(&mut s);
+            subject_id.hash(&mut s);
+            let prayer_id = s.finish();
+            let request = GetHpRequest{ agent_id, prayer_id, subject_id };
+
+            get_hp_request.send(request);
+
+            *made_world_query = true;
+            *state = AgentState::WaitForAction(prayer_id);
+        },
         Status::GetIsInventoryGE { ../*agent, item_class, amount*/ } => todo!(),
         Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),
         Status::RemoveEntitiesOfType(_item) => todo!(),
@@ -132,12 +155,16 @@ pub fn handle_prayer(
                             prayer_id,
                             movement,
                         });
+
+                        *made_world_query = true;
                         *state = AgentState::WaitForAction(prayer_id);
                     }
                 },
                 ethnolib::sandbox::ai::InpulseId::Plant => {
                     let Some(StackItem::EntityId(object_id)) = cpu.stack.pop() else {
                         cpu.stack.push(StackItem::failure());
+
+                        *made_world_query = true;
                         *state = AgentState::Running;
                         return
                     };
@@ -150,6 +177,7 @@ pub fn handle_prayer(
 
                     drop_request.send(DropRequest{ agent_id, prayer_id, object_id });
 
+                    *made_world_query = true;
                     *state = AgentState::WaitForAction(prayer_id);
 
                 },
