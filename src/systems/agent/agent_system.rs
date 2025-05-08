@@ -1,22 +1,17 @@
 use crate::{systems::{
-    actions::{self, ActionResult, DropRequest, GotoRequest, UseOnRequest},
-    agent::{handle_prayer, Agent, AgentState},
+    actions::{DropRequest, GotoRequest, UseOnRequest},
+    agent::{Agent, AgentState},
     query::{
-        FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult, GetEnergyRequest, GetEnergyResult, GetHpRequest, GetLocationRequest, GetLocationResult
+        FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetHpRequest, GetIsInventoryGERequest, GetLocationRequest
     },
 }, GameState};
 use bevy::prelude::*;
-use ethnolib::sandbox::{ai::StackItem, Location};
+
+use super::handle_prayer;
 
 
 pub fn agent_system(
     mut query: Query<(Entity, &mut Agent)>,
-    mut action_results: EventReader<ActionResult>,
-    mut find_in_inventory_results: EventReader<FindInInventoryResult>,
-    mut find_nearest_results: EventReader<FindNearestResult>,
-    mut get_energy_result: EventReader<GetEnergyResult>,
-    mut get_location_result: EventReader<GetLocationResult>,
-
 
     mut drop_request: EventWriter<DropRequest>,
     mut goto_request: EventWriter<GotoRequest>,
@@ -24,6 +19,7 @@ pub fn agent_system(
     mut find_nearest_request: EventWriter<FindNearestRequest>,
     mut get_energy_request: EventWriter<GetEnergyRequest>,
     mut get_hp_request: EventWriter<GetHpRequest>,
+    mut get_is_inventory_ge_request: EventWriter<GetIsInventoryGERequest>,
     mut get_location_request: EventWriter<GetLocationRequest>,
     mut use_on_request: EventWriter<UseOnRequest>,
 
@@ -33,118 +29,6 @@ pub fn agent_system(
 ) {
     let mut made_world_query = false;
     
-    for ActionResult {
-        agent_id,
-        prayer_id,
-        result,
-    } in action_results.read()
-    {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
-            continue;
-        };
-        let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
-            continue;
-        };
-
-        if action_waiting_for_id == prayer_id {
-            let result = match result {
-                actions::Result::Success => StackItem::success(),
-                actions::Result::Failure => StackItem::failure(),
-            };
-            agent.cpu.stack.push(result);
-            agent.state = AgentState::Running;
-        }
-    }
-
-    // handle FindInInventory prays being answered
-    for FindInInventoryResult {
-        agent_id,
-        prayer_id,
-        found_item_id_maybe,
-    } in find_in_inventory_results.read()
-    {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
-            continue;
-        };
-        let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
-            continue;
-        };
-
-        if action_waiting_for_id == prayer_id {
-            let result = found_item_id_maybe.into();
-            agent.cpu.stack.push(result);
-            agent.state = AgentState::Running;
-        }
-    }
-
-    for FindNearestResult {
-        agent_id,
-        prayer_id,
-        found_item_id_maybe,
-    } in find_nearest_results.read()
-    {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
-            continue;
-        };
-        let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
-            continue;
-        };
-
-        if action_waiting_for_id == prayer_id {
-            let result: StackItem = match found_item_id_maybe {
-                Some((x, _)) => Some(x),
-                None => None,
-            }
-            .into();
-            agent.cpu.stack.push(result);
-            agent.state = AgentState::Running;
-        }
-    }
-
-    for GetEnergyResult {
-        agent_id,
-        prayer_id,
-        energy_maybe,
-    } in get_energy_result.read()
-    {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
-            continue;
-        };
-        let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
-            continue;
-        };
-
-        if action_waiting_for_id == prayer_id {
-            let result: StackItem = energy_maybe.into();
-            agent.cpu.stack.push(result);
-            agent.state = AgentState::Running;
-        }
-    }
-
-    for GetLocationResult {
-        agent_id,
-        prayer_id,
-        location_maybe,
-    } in get_location_result.read()
-    {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
-            continue;
-        };
-        let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
-            continue;
-        };
-
-        if action_waiting_for_id == prayer_id {
-            let result: StackItem = match location_maybe {
-                Some(Location::Inventory(containter_id)) => Some(StackItem::EntityId(*containter_id)),
-                Some(Location::World { x, y }) => Some(StackItem::Coord { x: x.into(), y: y.into() }),
-                None => None,
-            }.into();
-            agent.cpu.stack.push(result);
-            agent.state = AgentState::Running;
-        }
-    }
-
     for (agent_id, mut agent) in &mut query {
         let Agent {
             cpu,
@@ -166,6 +50,7 @@ pub fn agent_system(
                         &mut find_nearest_request,
                         &mut get_energy_request,
                         &mut get_hp_request,
+                        &mut get_is_inventory_ge_request,
                         &mut get_location_request,
 
                         &mut use_on_request,

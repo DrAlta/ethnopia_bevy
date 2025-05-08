@@ -1,0 +1,6 @@
+mod get_is_inventory_ge_request;
+pub use get_is_inventory_ge_request::GetIsInventoryGERequest;
+mod get_is_inventory_ge_result;
+pub use get_is_inventory_ge_result::GetIsInventoryGEResult;
+mod get_is_inventory_ge_system;
+pub use get_is_inventory_ge_system::get_is_inventory_ge_system;

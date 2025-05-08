@@ -1,7 +1,7 @@
 use crate::systems::{
     actions::{DropRequest, GotoRequest, UseOnRequest},
     agent::AgentState,
-    query::{FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetHpRequest, GetLocationRequest},
+    query::{FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetHpRequest, GetIsInventoryGERequest, GetLocationRequest},
 };
 use bevy::prelude::*;
 use ethnolib::{
@@ -27,6 +27,7 @@ pub fn handle_prayer(
     find_nearest_request: &mut EventWriter<FindNearestRequest>,
     get_energy_request: &mut EventWriter<GetEnergyRequest>,
     get_hp_request: &mut EventWriter<GetHpRequest>,
+    get_is_inventory_ge_request: &mut EventWriter<GetIsInventoryGERequest>,
     get_location_request: &mut EventWriter<GetLocationRequest>,
 
     use_on_request: &mut EventWriter<UseOnRequest>,
@@ -115,7 +116,7 @@ pub fn handle_prayer(
         Status::GetHp(subject_id) => {
             let mut s = DefaultHasher::new();
             salt.hash(&mut s);
-            "GetLocation".hash(&mut s);
+            "GetHp".hash(&mut s);
             agent_id.hash(&mut s);
             subject_id.hash(&mut s);
             let prayer_id = s.finish();
@@ -126,7 +127,23 @@ pub fn handle_prayer(
             *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
         },
-        Status::GetIsInventoryGE { ../*agent, item_class, amount*/ } => todo!(),
+        Status::GetIsInventoryGE { agent, item_class, amount } => {
+            let subject_id = agent;
+            let mut s = DefaultHasher::new();
+            salt.hash(&mut s);
+            "GetIsInventoryGE".hash(&mut s);
+            agent_id.hash(&mut s);
+            subject_id.hash(&mut s);
+            item_class.hash(&mut s);
+            amount.hash(&mut s);
+            let prayer_id = s.finish();
+            let request = GetIsInventoryGERequest{ agent_id, prayer_id, subject_id, item_class, amount };
+
+            get_is_inventory_ge_request.send(request);
+
+            *made_world_query = true;
+            *state = AgentState::WaitForAction(prayer_id);
+        },
         Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),
         Status::RemoveEntitiesOfType(_item) => todo!(),
         Status::RetainEntitiesOfType(_item) => todo!(),
