@@ -1,14 +1,17 @@
-use crate::{systems::{
-    actions::{DropRequest, GotoRequest, UseOnRequest},
-    agent::{Agent, AgentState},
-    query::{
-        FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetHpRequest, GetIsInventoryGERequest, GetLocationRequest
+use crate::{
+    GameState,
+    systems::{
+        actions::{DropRequest, GotoRequest, UseOnRequest},
+        agent::{Agent, AgentState},
+        query::{
+            FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetHpRequest,
+            GetIsInventoryGERequest, GetLocationRequest,
+        },
     },
-}, GameState};
+};
 use bevy::prelude::*;
 
 use super::handle_prayer;
-
 
 pub fn agent_system(
     mut query: Query<(Entity, &mut Agent)>,
@@ -28,7 +31,7 @@ pub fn agent_system(
     //mut commands: Commands,
 ) {
     let mut made_world_query = false;
-    
+
     for (agent_id, mut agent) in &mut query {
         let Agent {
             cpu,
@@ -52,7 +55,6 @@ pub fn agent_system(
                         &mut get_hp_request,
                         &mut get_is_inventory_ge_request,
                         &mut get_location_request,
-
                         &mut use_on_request,
                         state,
                     );

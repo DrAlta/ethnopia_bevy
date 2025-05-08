@@ -1,7 +1,10 @@
 use crate::systems::{
     actions::{DropRequest, GotoRequest, UseOnRequest},
     agent::AgentState,
-    query::{FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetHpRequest, GetIsInventoryGERequest, GetLocationRequest},
+    query::{
+        FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetHpRequest,
+        GetIsInventoryGERequest, GetLocationRequest,
+    },
 };
 use bevy::prelude::*;
 use ethnolib::{
@@ -64,7 +67,7 @@ pub fn handle_prayer(
             let prayer_id = s.finish();
 
             use_on_request.send(request);
-            
+
             *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
 

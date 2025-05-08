@@ -2,12 +2,12 @@ use crate::systems::{
     actions::{self, ActionResult},
     agent::{Agent, AgentState},
     query::{
-        FindInInventoryResult, FindNearestResult, GetEnergyResult, GetIsInventoryGEResult, GetLocationResult
+        FindInInventoryResult, FindNearestResult, GetEnergyResult, GetIsInventoryGEResult,
+        GetLocationResult,
     },
 };
 use bevy::prelude::*;
-use ethnolib::sandbox::{ai::StackItem, Location};
-
+use ethnolib::sandbox::{Location, ai::StackItem};
 
 pub fn receive_prayers_system(
     mut query: Query<(Entity, &mut Agent)>,
@@ -141,13 +141,18 @@ pub fn receive_prayers_system(
 
         if action_waiting_for_id == prayer_id {
             let result: StackItem = match location_maybe {
-                Some(Location::Inventory(containter_id)) => Some(StackItem::EntityId(*containter_id)),
-                Some(Location::World { x, y }) => Some(StackItem::Coord { x: x.into(), y: y.into() }),
+                Some(Location::Inventory(containter_id)) => {
+                    Some(StackItem::EntityId(*containter_id))
+                }
+                Some(Location::World { x, y }) => Some(StackItem::Coord {
+                    x: x.into(),
+                    y: y.into(),
+                }),
                 None => None,
-            }.into();
+            }
+            .into();
             agent.cpu.stack.push(result);
             agent.state = AgentState::Running;
         }
     }
-
 }

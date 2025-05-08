@@ -35,7 +35,13 @@ mod game_state;
 pub use game_state::GameState;
 pub mod systems;
 use systems::{
-    agent_system, cache_inventory_system, query::{find_in_inventory_system, find_nearest_system, get_energy_system, get_hp_system, get_is_inventory_ge_system, get_location_system, FindInInventoryRequest, FindInInventoryResult}, receive_prayers_system, salt_system, Salt
+    Salt, agent_system, cache_inventory_system,
+    query::{
+        FindInInventoryRequest, FindInInventoryResult, find_in_inventory_system,
+        find_nearest_system, get_energy_system, get_hp_system, get_is_inventory_ge_system,
+        get_location_system,
+    },
+    receive_prayers_system, salt_system,
 };
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
@@ -83,7 +89,6 @@ fn main() {
         .add_event::<FindInInventoryResult>()
         // ui
         .add_event::<ui::UISelect>()
-        
         .add_systems(
             Update,
             (
@@ -99,13 +104,13 @@ fn main() {
                     ),
                     // resolve the changes that actions wanted to have on the world
                     change_request_system,
-                ).chain().run_if(in_state(GameState::RunningSimulation)),
+                )
+                    .chain()
+                    .run_if(in_state(GameState::RunningSimulation)),
                 // world sim finished
                 // build caches
-                (
-                    cache_inventory_system,
-                    systems::bvh_system,
-                ).run_if(in_state(GameState::RunningSimulation)),
+                (cache_inventory_system, systems::bvh_system)
+                    .run_if(in_state(GameState::RunningSimulation)),
                 // 'answer divination prayers' and 'run AI' should loop until 'run AI' stops generating new divination prayers(or some time out)
                 (
                     // answer divination prayers
@@ -117,21 +122,11 @@ fn main() {
                     get_location_system,
                 ),
                 // run A
-                (
-                    receive_prayers_system,
-                    agent_system,
-                ).chain(),
+                (receive_prayers_system, agent_system).chain(),
                 // answer supplication prayers
-                (
-                    goto_system
-                ).run_if(in_state(GameState::RunningSimulation)),
+                (goto_system).run_if(in_state(GameState::RunningSimulation)),
                 // UI
-                (
-                    pawn_spawn,
-                    picking_system,
-                    hover_out_system,
-                    ui::ui_system,
-                ).chain(),
+                (pawn_spawn, picking_system, hover_out_system, ui::ui_system).chain(),
             )
                 .chain(),
         )
@@ -145,7 +140,6 @@ fn main() {
             )
                 .chain(),
         )*/
-
         .run();
 }
 
