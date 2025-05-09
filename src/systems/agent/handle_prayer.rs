@@ -8,12 +8,10 @@ use crate::systems::{
 };
 use bevy::prelude::*;
 use ethnolib::{
-    Number,
     sandbox::{
-        ai::{CPU, StackItem, Status},
+        ai::{StackItem, Status, ThreadName, CPU},
         world::Movement,
-    },
-    vec2,
+    }, vec2, Number
 };
 use qol::placeholder;
 use std::hash::{DefaultHasher, Hash, Hasher};
@@ -22,6 +20,7 @@ pub fn handle_prayer(
     made_world_query: &mut bool,
 
     agent_id: Entity,
+    main: &ThreadName,
     ok: Status,
     cpu: &mut CPU,
     drop_request: &mut EventWriter<DropRequest>,
@@ -38,8 +37,20 @@ pub fn handle_prayer(
 ) -> () {
     let salt = 0;
     match ok {
-        Status::Success => todo!(),
-        Status::Failure => todo!(),
+        Status::Success => {
+            cpu.stack = vec![StackItem::success()];
+            cpu.return_stack= Vec::new();
+            cpu.pc = Some((main.clone(), 0));
+
+            *state = AgentState::Running;
+        },
+        Status::Failure => {
+            cpu.stack = vec![StackItem::failure()];
+            cpu.return_stack= Vec::new();
+            cpu.pc = Some((main.clone(), 0));
+
+            *state = AgentState::Running;
+        },
         Status::FindInInventory { item_class } => {
             let mut s = DefaultHasher::new();
             salt.hash(&mut s);

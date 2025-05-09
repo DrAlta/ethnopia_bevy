@@ -38,6 +38,7 @@ pub fn agent_system(
             blackboard,
             bt,
             state,
+            main,
         } = agent.as_mut();
         match state {
             AgentState::Running => match cpu.step(bt, blackboard) {
@@ -45,6 +46,7 @@ pub fn agent_system(
                     handle_prayer(
                         &mut made_world_query,
                         agent_id,
+                        main,
                         ok,
                         cpu,
                         &mut drop_request,
