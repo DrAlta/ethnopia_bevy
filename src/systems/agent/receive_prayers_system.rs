@@ -2,21 +2,22 @@ use crate::systems::{
     actions::{self, ActionResult},
     agent::{Agent, AgentState},
     query::{
-        FindInInventoryResult, FindNearestResult, GetEnergyResult, GetIsInventoryGEResult,
-        GetLocationResult,
+        FindInInventoryResult, FindNearestResult, GetEnergyResult, GetEntitiesResult,
+        GetIsInventoryGEResult, GetLocationResult,
     },
 };
 use bevy::prelude::*;
 use ethnolib::sandbox::{Location, ai::StackItem};
 
 pub fn receive_prayers_system(
-    mut query: Query<(Entity, &mut Agent)>,
+    mut query: Query<&mut Agent>,
     mut action_results: EventReader<ActionResult>,
     mut find_in_inventory_results: EventReader<FindInInventoryResult>,
     mut find_nearest_results: EventReader<FindNearestResult>,
-    mut get_energy_result: EventReader<GetEnergyResult>,
-    mut get_is_inventory_ge_result: EventReader<GetIsInventoryGEResult>,
-    mut get_location_result: EventReader<GetLocationResult>,
+    mut get_energy_results: EventReader<GetEnergyResult>,
+    mut get_entities_results: EventReader<GetEntitiesResult>,
+    mut get_is_inventory_ge_results: EventReader<GetIsInventoryGEResult>,
+    mut get_location_results: EventReader<GetLocationResult>,
 ) {
     for ActionResult {
         agent_id,
@@ -24,7 +25,7 @@ pub fn receive_prayers_system(
         result,
     } in action_results.read()
     {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
+        let Ok(mut agent) = query.get_mut(*agent_id) else {
             continue;
         };
         let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
@@ -48,7 +49,7 @@ pub fn receive_prayers_system(
         found_item_id_maybe,
     } in find_in_inventory_results.read()
     {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
+        let Ok(mut agent) = query.get_mut(*agent_id) else {
             continue;
         };
         let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
@@ -68,7 +69,7 @@ pub fn receive_prayers_system(
         found_item_id_maybe,
     } in find_nearest_results.read()
     {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
+        let Ok(mut agent) = query.get_mut(*agent_id) else {
             continue;
         };
         let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
@@ -90,9 +91,9 @@ pub fn receive_prayers_system(
         agent_id,
         prayer_id,
         energy_maybe,
-    } in get_energy_result.read()
+    } in get_energy_results.read()
     {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
+        let Ok(mut agent) = query.get_mut(*agent_id) else {
             continue;
         };
         let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
@@ -106,13 +107,34 @@ pub fn receive_prayers_system(
         }
     }
 
+    for GetEntitiesResult {
+        agent_id,
+        prayer_id,
+        entities,
+    } in get_entities_results.read()
+    {
+        let Ok(mut agent) = query.get_mut(*agent_id) else {
+            continue;
+        };
+        let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
+            continue;
+        };
+
+        if action_waiting_for_id == prayer_id {
+            let iter = entities.into_iter();
+            let result = StackItem::from_iter(iter);
+            agent.cpu.stack.push(result);
+            agent.state = AgentState::Running;
+        }
+    }
+
     for GetIsInventoryGEResult {
         agent_id,
         prayer_id,
         ge_maybe,
-    } in get_is_inventory_ge_result.read()
+    } in get_is_inventory_ge_results.read()
     {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
+        let Ok(mut agent) = query.get_mut(*agent_id) else {
             continue;
         };
         let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
@@ -130,9 +152,9 @@ pub fn receive_prayers_system(
         agent_id,
         prayer_id,
         location_maybe,
-    } in get_location_result.read()
+    } in get_location_results.read()
     {
-        let Ok((_, mut agent)) = query.get_mut(*agent_id) else {
+        let Ok(mut agent) = query.get_mut(*agent_id) else {
             continue;
         };
         let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {

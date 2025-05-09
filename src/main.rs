@@ -37,9 +37,11 @@ pub mod systems;
 use systems::{
     Salt, agent_system, cache_inventory_system,
     query::{
-        FindInInventoryRequest, FindInInventoryResult, find_in_inventory_system,
-        find_nearest_system, get_energy_system, get_hp_system, get_is_inventory_ge_system,
-        get_location_system,
+        FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult,
+        GetEnergyRequest, GetEnergyResult, GetEntitiesRequest, GetEntitiesResult, GetHpRequest,
+        GetHpResult, GetIsInventoryGERequest, GetIsInventoryGEResult, GetLocationRequest,
+        GetLocationResult, find_in_inventory_system, find_nearest_system, get_energy_system,
+        get_entities_system, get_hp_system, get_is_inventory_ge_system, get_location_system,
     },
     receive_prayers_system, salt_system,
 };
@@ -87,6 +89,18 @@ fn main() {
         // prayers
         .add_event::<FindInInventoryRequest>()
         .add_event::<FindInInventoryResult>()
+        .add_event::<FindNearestRequest>()
+        .add_event::<FindNearestResult>()
+        .add_event::<GetEnergyRequest>()
+        .add_event::<GetEnergyResult>()
+        .add_event::<GetEntitiesRequest>()
+        .add_event::<GetEntitiesResult>()
+        .add_event::<GetHpRequest>()
+        .add_event::<GetHpResult>()
+        .add_event::<GetIsInventoryGERequest>()
+        .add_event::<GetIsInventoryGEResult>()
+        .add_event::<GetLocationRequest>()
+        .add_event::<GetLocationResult>()
         // ui
         .add_event::<ui::UISelect>()
         .add_systems(
@@ -117,6 +131,7 @@ fn main() {
                     find_in_inventory_system,
                     find_nearest_system,
                     get_energy_system,
+                    get_entities_system,
                     get_hp_system,
                     get_is_inventory_ge_system,
                     get_location_system,
