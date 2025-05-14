@@ -40,6 +40,7 @@ pub fn picking_system(
                 } => {
                     use_event.send(UseRequest {
                         agent_id: *agent_id,
+                        prayer_id: 42,
                         target_id: *thing,
                     });
                 }

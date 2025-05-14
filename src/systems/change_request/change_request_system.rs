@@ -14,11 +14,12 @@ pub fn change_request_system(
     mut conflicts: EventWriter<ChangeConflict>,
     mut commands: Commands,
 ) {
-    let mut change_requests_by_contentous_entities = HashMap::<Entity, Vec<Hash>>::new();
+    let mut change_requests_by_contentous_entities = HashMap::<Entity, Vec<(u64, Hash)>>::new();
     let mut change_requests = BTreeMap::<Hash, (&BTreeSet<Entity>, &Vec<Changes>)>::new();
     let mut collisions = Vec::new();
 
     for ChangeRequest {
+        prayer_id,
         hash,
         contentious_entities,
         changes,
@@ -30,14 +31,15 @@ pub fn change_request_system(
         } else {
             change_requests.insert(hash.clone(), (contentious_entities, changes));
             for &contentious in contentious_entities {
-                change_requests_by_contentous_entities.push_or_insert(contentious, hash.clone());
+                change_requests_by_contentous_entities
+                    .push_or_insert(contentious, (*prayer_id, hash.clone()));
             }
         }
     }
 
     // remove hash collision
     for (_, vec) in change_requests_by_contentous_entities.iter_mut() {
-        vec.retain(|x| !collisions.contains(x));
+        vec.retain(|(_, x)| !collisions.contains(x));
     }
 
     for (request_hash, &(contentious_entities, changes)) in &change_requests {
@@ -47,7 +49,7 @@ pub fn change_request_system(
         let mut cleared = true;
         for contentious in contentious_entities {
             if let Some(thing) = change_requests_by_contentous_entities.get_mut(contentious) {
-                thing.retain(|x| x != request_hash);
+                thing.retain(|(_, x)| x != request_hash);
                 if !thing.is_empty() {
                     cleared = false;
                 }

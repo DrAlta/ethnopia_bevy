@@ -2,6 +2,8 @@ mod action_result;
 pub use action_result::{ActionResult, Result};
 mod drop;
 pub use drop::{DropRequest, drop_system};
+mod eat_class;
+pub use eat_class::{EatClassRequest, eat_class_system};
 mod goto;
 pub use goto::{GotoRequest, goto_system};
 mod use_object;

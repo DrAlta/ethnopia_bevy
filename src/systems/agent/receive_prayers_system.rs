@@ -1,9 +1,12 @@
+use std::sync::Arc;
+
 use crate::systems::{
     actions::{self, ActionResult},
     agent::{Agent, AgentState},
     query::{
         FindInInventoryResult, FindNearestResult, GetEnergyResult, GetEntitiesResult,
-        GetIsInventoryGEResult, GetLocationResult,
+        GetIsInventoryGEResult, GetLocationResult, RemoveEntitiesOfClassResult,
+        RetainEntitiesOfClassResult,
     },
 };
 use bevy::prelude::*;
@@ -18,6 +21,8 @@ pub fn receive_prayers_system(
     mut get_entities_results: EventReader<GetEntitiesResult>,
     mut get_is_inventory_ge_results: EventReader<GetIsInventoryGEResult>,
     mut get_location_results: EventReader<GetLocationResult>,
+    mut remove_entities_of_class_results: EventReader<RemoveEntitiesOfClassResult>,
+    mut retain_entities_of_class_results: EventReader<RetainEntitiesOfClassResult>,
 ) {
     for ActionResult {
         agent_id,
@@ -173,6 +178,44 @@ pub fn receive_prayers_system(
                 None => None,
             }
             .into();
+            agent.cpu.stack.push(result);
+            agent.state = AgentState::Running;
+        }
+    }
+    for RemoveEntitiesOfClassResult {
+        agent_id,
+        prayer_id,
+        table,
+    } in remove_entities_of_class_results.read()
+    {
+        let Ok(mut agent) = query.get_mut(*agent_id) else {
+            continue;
+        };
+        let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
+            continue;
+        };
+
+        if action_waiting_for_id == prayer_id {
+            let result: StackItem = StackItem::Table(Arc::new(table.clone()));
+            agent.cpu.stack.push(result);
+            agent.state = AgentState::Running;
+        }
+    }
+    for RetainEntitiesOfClassResult {
+        agent_id,
+        prayer_id,
+        table,
+    } in retain_entities_of_class_results.read()
+    {
+        let Ok(mut agent) = query.get_mut(*agent_id) else {
+            continue;
+        };
+        let AgentState::WaitForAction(action_waiting_for_id) = &agent.state else {
+            continue;
+        };
+
+        if action_waiting_for_id == prayer_id {
+            let result: StackItem = StackItem::Table(Arc::new(table.clone()));
             agent.cpu.stack.push(result);
             agent.state = AgentState::Running;
         }

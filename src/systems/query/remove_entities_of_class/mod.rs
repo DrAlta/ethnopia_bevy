@@ -1,0 +1,6 @@
+mod remove_entities_of_class_request;
+pub use remove_entities_of_class_request::RemoveEntitiesOfClassRequest;
+mod remove_entities_of_class_result;
+pub use remove_entities_of_class_result::RemoveEntitiesOfClassResult;
+mod remove_entities_of_class_system;
+pub use remove_entities_of_class_system::remove_entities_of_class_system;

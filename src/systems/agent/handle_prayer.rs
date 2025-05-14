@@ -1,9 +1,10 @@
 use crate::systems::{
-    actions::{DropRequest, GotoRequest, UseOnRequest},
+    actions::{DropRequest, GotoRequest, UseOnRequest, UseRequest},
     agent::AgentState,
     query::{
         FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetEntitiesRequest,
-        GetHpRequest, GetIsInventoryGERequest, GetLocationRequest,
+        GetHpRequest, GetIsInventoryGERequest, GetLocationRequest, RemoveEntitiesOfClassRequest,
+        RetainEntitiesOfClassRequest,
     },
 };
 use bevy::prelude::*;
@@ -34,7 +35,10 @@ pub fn handle_prayer(
     get_hp_request: &mut EventWriter<GetHpRequest>,
     get_is_inventory_ge_request: &mut EventWriter<GetIsInventoryGERequest>,
     get_location_request: &mut EventWriter<GetLocationRequest>,
+    remove_entities_of_class_request: &mut EventWriter<RemoveEntitiesOfClassRequest>,
+    retain_entities_of_class_request: &mut EventWriter<RetainEntitiesOfClassRequest>,
 
+    use_request: &mut EventWriter<UseRequest>,
     use_on_request: &mut EventWriter<UseOnRequest>,
     state: &mut AgentState,
 ) -> () {
@@ -73,12 +77,6 @@ pub fn handle_prayer(
             *state = AgentState::WaitForAction(prayer_id);
         }
         Status::UseOn(tool_id, target_id) => {
-            let request = UseOnRequest {
-                agent_id,
-                tool_id,
-                target_id,
-            };
-
             let mut s = DefaultHasher::new();
             salt.hash(&mut s);
             "UseOn".hash(&mut s);
@@ -87,6 +85,13 @@ pub fn handle_prayer(
             target_id.hash(&mut s);
             //movement.hash(&mut s);
             let prayer_id = s.finish();
+
+            let request = UseOnRequest {
+                agent_id,
+                prayer_id,
+                tool_id,
+                target_id,
+            };
 
             use_on_request.send(request);
 
@@ -225,8 +230,58 @@ pub fn handle_prayer(
             *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
         }
-        Status::RemoveEntitiesOfType(_item) => todo!(),
-        Status::RetainEntitiesOfType(_item) => todo!(),
+        Status::RemoveEntitiesOfType(item) => {
+            let Some(StackItem::Table(_)) = cpu.stack.last() else {
+                todo!()
+            };
+            let Some(StackItem::Table(table)) = cpu.stack.pop() else {
+                unreachable!()
+            };
+            let mut s = DefaultHasher::new();
+            salt.hash(&mut s);
+            "RemoveEntitiesOfClass".hash(&mut s);
+            agent_id.hash(&mut s);
+            item.hash(&mut s);
+            table.hash(&mut s);
+            let prayer_id = s.finish();
+
+            let request = RemoveEntitiesOfClassRequest {
+                agent_id,
+                prayer_id,
+                item_class: item,
+                table,
+            };
+            remove_entities_of_class_request.send(request);
+
+            *made_world_query = true;
+            *state = AgentState::WaitForAction(prayer_id);
+        }
+        Status::RetainEntitiesOfType(item) => {
+            let Some(StackItem::Table(_)) = cpu.stack.last() else {
+                todo!()
+            };
+            let Some(StackItem::Table(table)) = cpu.stack.pop() else {
+                unreachable!()
+            };
+            let mut s = DefaultHasher::new();
+            salt.hash(&mut s);
+            "RemoveEntitiesOfClass".hash(&mut s);
+            agent_id.hash(&mut s);
+            item.hash(&mut s);
+            table.hash(&mut s);
+            let prayer_id = s.finish();
+
+            let request = RetainEntitiesOfClassRequest {
+                agent_id,
+                prayer_id,
+                item_class: item,
+                table,
+            };
+            retain_entities_of_class_request.send(request);
+
+            *made_world_query = true;
+            *state = AgentState::WaitForAction(prayer_id);
+        }
         Status::Running(inpulse_id) => match inpulse_id {
             ethnolib::sandbox::ai::InpulseId::Act1 => todo!(),
             ethnolib::sandbox::ai::InpulseId::Act2 => todo!(),
@@ -278,10 +333,27 @@ pub fn handle_prayer(
                 *state = AgentState::WaitForAction(prayer_id);
             }
             ethnolib::sandbox::ai::InpulseId::Take => todo!(),
-            ethnolib::sandbox::ai::InpulseId::Use => todo!(),
+            ethnolib::sandbox::ai::InpulseId::Use => {
+                if let Some(StackItem::EntityId(target_id)) = cpu.stack.pop() {
+                    let mut s = DefaultHasher::new();
+                    salt.hash(&mut s);
+                    "Use".hash(&mut s);
+                    agent_id.hash(&mut s);
+                    target_id.hash(&mut s);
+                    let prayer_id = s.finish();
+                    use_request.send(UseRequest {
+                        agent_id,
+                        prayer_id,
+                        target_id,
+                    });
+
+                    *made_world_query = true;
+                    *state = AgentState::WaitForAction(prayer_id);
+                }
+            }
             ethnolib::sandbox::ai::InpulseId::UseOn => todo!(),
             ethnolib::sandbox::ai::InpulseId::EatClass(_food_class) => {}
         },
-        Status::None => todo!(),
+        Status::None => (),
     }
 }

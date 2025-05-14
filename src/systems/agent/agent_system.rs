@@ -1,11 +1,12 @@
 use crate::{
     GameState,
     systems::{
-        actions::{DropRequest, GotoRequest, UseOnRequest},
+        actions::{DropRequest, GotoRequest, UseOnRequest, UseRequest},
         agent::{Agent, AgentState},
         query::{
             FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetEntitiesRequest,
             GetHpRequest, GetIsInventoryGERequest, GetLocationRequest,
+            RemoveEntitiesOfClassRequest, RetainEntitiesOfClassRequest,
         },
     },
 };
@@ -25,6 +26,10 @@ pub fn agent_system(
     mut get_hp_request: EventWriter<GetHpRequest>,
     mut get_is_inventory_ge_request: EventWriter<GetIsInventoryGERequest>,
     mut get_location_request: EventWriter<GetLocationRequest>,
+    mut remove_entities_of_class_request: EventWriter<RemoveEntitiesOfClassRequest>,
+    mut retain_entities_of_class_request: EventWriter<RetainEntitiesOfClassRequest>,
+
+    mut use_request: EventWriter<UseRequest>,
     mut use_on_request: EventWriter<UseOnRequest>,
 
     state: Res<State<GameState>>,
@@ -59,6 +64,9 @@ pub fn agent_system(
                         &mut get_hp_request,
                         &mut get_is_inventory_ge_request,
                         &mut get_location_request,
+                        &mut remove_entities_of_class_request,
+                        &mut retain_entities_of_class_request,
+                        &mut use_request,
                         &mut use_on_request,
                         state,
                     );

@@ -35,7 +35,9 @@ mod game_state;
 pub use game_state::GameState;
 pub mod systems;
 use systems::{
-    Salt, agent_system, cache_inventory_system,
+    Salt,
+    actions::{EatClassRequest, eat_class_system, use_on_system},
+    agent_system, cache_inventory_system,
     query::{
         FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult,
         GetEnergyRequest, GetEnergyResult, GetEntitiesRequest, GetEntitiesResult, GetHpRequest,
@@ -71,6 +73,7 @@ fn main() {
         .add_event::<TravelCompleted>()
         .add_event::<Collision>()
         // actions
+        .add_event::<EatClassRequest>()
         .add_event::<GotoRequest>()
         .add_event::<UseRequest>()
         .add_event::<UseOnRequest>()
@@ -114,7 +117,9 @@ fn main() {
                     collision_report_system,
                     (
                         // action systems
+                        eat_class_system,
                         use_object_system,
+                        use_on_system,
                     ),
                     // resolve the changes that actions wanted to have on the world
                     change_request_system,

@@ -1,0 +1,6 @@
+mod retain_entities_of_class_request;
+pub use retain_entities_of_class_request::RetainEntitiesOfClassRequest;
+mod retain_entities_of_class_result;
+pub use retain_entities_of_class_result::RetainEntitiesOfClassResult;
+mod retain_entities_of_class_system;
+pub use retain_entities_of_class_system::retain_entities_of_class_system;

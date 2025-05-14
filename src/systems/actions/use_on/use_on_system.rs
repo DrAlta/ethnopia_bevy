@@ -24,6 +24,7 @@ pub fn use_on_system(
     let salt = 0;
     for UseOnRequest {
         agent_id,
+        prayer_id,
         tool_id,
         target_id,
     } in use_on_requests.read()
@@ -39,6 +40,7 @@ pub fn use_on_system(
             Ok((contentious_entities, changes)) => {
                 logy!("trace-use-object", "{agent_id:?} used {target_id:?}");
                 commands.send_event(ChangeRequest {
+                    prayer_id: *prayer_id,
                     hash,
                     contentious_entities,
                     changes,
