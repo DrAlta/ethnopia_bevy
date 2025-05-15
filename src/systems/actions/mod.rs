@@ -6,6 +6,8 @@ mod eat_class;
 pub use eat_class::{EatClassRequest, eat_class_system};
 mod goto;
 pub use goto::{GotoRequest, goto_system};
+mod take;
+pub use take::{TakeRequest, take_system};
 mod use_object;
 pub use use_object::{UseRequest, use_object_system};
 mod use_on;

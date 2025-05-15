@@ -1,5 +1,5 @@
 use crate::systems::{
-    actions::{DropRequest, GotoRequest, UseOnRequest, UseRequest},
+    actions::{DropRequest, GotoRequest, TakeRequest, UseOnRequest, UseRequest},
     agent::AgentState,
     query::{
         FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetEntitiesRequest,
@@ -16,7 +16,7 @@ use ethnolib::{
     },
     vec2,
 };
-use qol::placeholder;
+use qol::{logy, placeholder};
 use std::hash::{DefaultHasher, Hash, Hasher};
 
 pub fn handle_prayer(
@@ -26,8 +26,13 @@ pub fn handle_prayer(
     main: &ThreadName,
     ok: Status,
     cpu: &mut CPU,
+    /*
     drop_request: &mut EventWriter<DropRequest>,
     goto_request: &mut EventWriter<GotoRequest>,
+    take_request: &mut EventWriter<TakeRequest>,
+    use_request: &mut EventWriter<UseRequest>,
+    use_on_request: &mut EventWriter<UseOnRequest>,
+    */
     find_in_inventory_request: &mut EventWriter<FindInInventoryRequest>,
     find_nearest_request: &mut EventWriter<FindNearestRequest>,
     get_energy_request: &mut EventWriter<GetEnergyRequest>,
@@ -38,9 +43,8 @@ pub fn handle_prayer(
     remove_entities_of_class_request: &mut EventWriter<RemoveEntitiesOfClassRequest>,
     retain_entities_of_class_request: &mut EventWriter<RetainEntitiesOfClassRequest>,
 
-    use_request: &mut EventWriter<UseRequest>,
-    use_on_request: &mut EventWriter<UseOnRequest>,
     state: &mut AgentState,
+    commands: &mut Commands,
 ) -> () {
     let salt = 0;
     match ok {
@@ -93,7 +97,7 @@ pub fn handle_prayer(
                 target_id,
             };
 
-            use_on_request.send(request);
+            commands.send_event(request);
 
             *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
@@ -283,9 +287,11 @@ pub fn handle_prayer(
             *state = AgentState::WaitForAction(prayer_id);
         }
         Status::Running(inpulse_id) => match inpulse_id {
-            ethnolib::sandbox::ai::InpulseId::Act1 => todo!(),
-            ethnolib::sandbox::ai::InpulseId::Act2 => todo!(),
-            ethnolib::sandbox::ai::InpulseId::Act3 => todo!(),
+            ethnolib::sandbox::ai::InpulseId::Act1 |
+            ethnolib::sandbox::ai::InpulseId::Act2 |
+            ethnolib::sandbox::ai::InpulseId::Act3 => {
+                logy!("warning", "got an prayer for {inpulse_id:?}");
+            },
             ethnolib::sandbox::ai::InpulseId::GoTo => {
                 if let Some(StackItem::Coord { x, y }) = cpu.stack.pop() {
                     let movement = Movement {
@@ -298,11 +304,14 @@ pub fn handle_prayer(
                     agent_id.hash(&mut s);
                     movement.hash(&mut s);
                     let prayer_id = s.finish();
-                    goto_request.send(GotoRequest {
+                    let request = GotoRequest {
                         agent_id,
                         prayer_id,
                         movement,
-                    });
+                    };
+
+                    commands.send_event(request);
+
 
                     *made_world_query = true;
                     *state = AgentState::WaitForAction(prayer_id);
@@ -323,16 +332,45 @@ pub fn handle_prayer(
                 object_id.hash(&mut s);
                 let prayer_id = s.finish();
 
-                drop_request.send(DropRequest {
+                let request = DropRequest {
                     agent_id,
                     prayer_id,
                     object_id,
-                });
+                };
+
+                commands.send_event(request);
+
 
                 *made_world_query = true;
                 *state = AgentState::WaitForAction(prayer_id);
             }
-            ethnolib::sandbox::ai::InpulseId::Take => todo!(),
+            ethnolib::sandbox::ai::InpulseId::Take => {
+                let Some(StackItem::EntityId(object_id)) = cpu.stack.pop() else {
+                    cpu.stack.push(StackItem::failure());
+
+                    *made_world_query = true;
+                    *state = AgentState::Running;
+                    return;
+                };
+                let mut s = DefaultHasher::new();
+                salt.hash(&mut s);
+                "Take".hash(&mut s);
+                agent_id.hash(&mut s);
+                object_id.hash(&mut s);
+                let prayer_id = s.finish();
+
+                let request = TakeRequest {
+                    agent_id,
+                    prayer_id,
+                    object_id,
+                };
+
+                commands.send_event(request);
+
+
+                *made_world_query = true;
+                *state = AgentState::WaitForAction(prayer_id);
+            },
             ethnolib::sandbox::ai::InpulseId::Use => {
                 if let Some(StackItem::EntityId(target_id)) = cpu.stack.pop() {
                     let mut s = DefaultHasher::new();
@@ -341,11 +379,13 @@ pub fn handle_prayer(
                     agent_id.hash(&mut s);
                     target_id.hash(&mut s);
                     let prayer_id = s.finish();
-                    use_request.send(UseRequest {
+                    let request = UseRequest {
                         agent_id,
                         prayer_id,
                         target_id,
-                    });
+                    };
+
+                    commands.send_event(request);
 
                     *made_world_query = true;
                     *state = AgentState::WaitForAction(prayer_id);

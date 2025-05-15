@@ -22,7 +22,7 @@ use crate::systems::{
         ActionResult, GotoRequest, UseOnRequest, UseRequest, goto_system, use_object_system,
     },
     change_request::{
-        ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeRequest,
+        ChangeConflict, ChangeDespawn, ChangeEnergy, ChangeHp, ChangeLocation, ChangeRequest,
         ChangeSpawnLocationType, change_request_system,
     },
     movement::{TravelCompleted, process_movement},
@@ -35,17 +35,9 @@ mod game_state;
 pub use game_state::GameState;
 pub mod systems;
 use systems::{
-    Salt,
-    actions::{EatClassRequest, eat_class_system, use_on_system},
-    agent_system, cache_inventory_system,
-    query::{
-        FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult,
-        GetEnergyRequest, GetEnergyResult, GetEntitiesRequest, GetEntitiesResult, GetHpRequest,
-        GetHpResult, GetIsInventoryGERequest, GetIsInventoryGEResult, GetLocationRequest,
-        GetLocationResult, find_in_inventory_system, find_nearest_system, get_energy_system,
-        get_entities_system, get_hp_system, get_is_inventory_ge_system, get_location_system,
-    },
-    receive_prayers_system, salt_system,
+    actions::{eat_class_system, use_on_system, EatClassRequest, TakeRequest}, agent_system, cache_inventory_system, change_request::change_systems::{despawn_request_system, energy_request_system, hp_request_system, location_request_system, spawn_location_type_request_system}, query::{
+        find_in_inventory_system, find_nearest_system, get_energy_system, get_entities_system, get_hp_system, get_is_inventory_ge_system, get_location_system, FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult, GetEnergyRequest, GetEnergyResult, GetEntitiesRequest, GetEntitiesResult, GetHpRequest, GetHpResult, GetIsInventoryGERequest, GetIsInventoryGEResult, GetLocationRequest, GetLocationResult
+    }, receive_prayers_system, salt_system, Salt
 };
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
@@ -75,6 +67,7 @@ fn main() {
         // actions
         .add_event::<EatClassRequest>()
         .add_event::<GotoRequest>()
+        .add_event::<TakeRequest>()
         .add_event::<UseRequest>()
         .add_event::<UseOnRequest>()
         // action results
@@ -88,6 +81,7 @@ fn main() {
         .add_event::<ChangeDespawn>()
         .add_event::<ChangeEnergy>()
         .add_event::<ChangeHp>()
+        .add_event::<ChangeLocation>()
         .add_event::<ChangeSpawnLocationType>()
         // prayers
         .add_event::<FindInInventoryRequest>()
@@ -123,6 +117,13 @@ fn main() {
                     ),
                     // resolve the changes that actions wanted to have on the world
                     change_request_system,
+                    (
+                        despawn_request_system,
+                        energy_request_system,
+                        hp_request_system,
+                        location_request_system,
+                        spawn_location_type_request_system,
+                    ),
                 )
                     .chain()
                     .run_if(in_state(GameState::RunningSimulation)),

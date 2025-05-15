@@ -11,5 +11,6 @@ pub enum Changes {
     Despawn(EntityId),
     Energy { entity_id: EntityId, delta: i32 },
     Hp { entity_id: EntityId, delta: i32 },
+    Location { entity_id: EntityId, location: Location },
     SpawnLocationType { location: Location, tyep: Item },
 }
