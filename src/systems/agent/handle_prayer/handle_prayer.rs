@@ -1,25 +1,27 @@
+use std::hash::{DefaultHasher, Hash, Hasher};
+
+use bevy::prelude::*;
+use qol::{logy, placeholder};
+
+use ethnolib::{
+    Number,
+    sandbox::{
+        ai::{CPU, StackItem, Status, ThreadName},
+        world::Movement,
+    },
+    vec2,
+};
+
 use crate::systems::{
     Salt,
-    actions::{DropRequest, GotoRequest, TakeRequest, UseOnRequest, UseRequest},
-    agent::AgentState,
+    actions::{DropRequest, GotoRequest, TakeRequest, UseRequest},
+    agent::{AgentState, handle_prayer::handle_use_on},
     query::{
         FindInInventoryRequest, FindNearestRequest, GetEnergyRequest, GetEntitiesRequest,
         GetHpRequest, GetIsInventoryGERequest, GetLocationRequest, RemoveEntitiesOfClassRequest,
         RetainEntitiesOfClassRequest,
     },
 };
-use bevy::prelude::*;
-use ethnolib::{
-    Number,
-    sandbox::{
-        EntityId,
-        ai::{CPU, StackItem, Status, ThreadName},
-        world::Movement,
-    },
-    vec2,
-};
-use qol::{logy, placeholder};
-use std::hash::{DefaultHasher, Hash, Hasher};
 
 pub fn handle_prayer(
     made_world_query: &mut bool,
@@ -82,7 +84,7 @@ pub fn handle_prayer(
             *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
         }
-        Status::UseOn(tool_id, target_id) => use_on(
+        Status::UseOn(tool_id, target_id) => handle_use_on(
             agent_id,
             tool_id,
             target_id,
@@ -403,7 +405,7 @@ pub fn handle_prayer(
                     return;
                 };
 
-                use_on(
+                handle_use_on(
                     agent_id,
                     tool_id,
                     target_id,
@@ -417,35 +419,4 @@ pub fn handle_prayer(
         },
         Status::None => (),
     }
-}
-
-fn use_on(
-    agent_id: EntityId,
-    tool_id: EntityId,
-    target_id: EntityId,
-    made_world_query: &mut bool,
-    state: &mut AgentState,
-    salt: Salt,
-    commands: &mut Commands,
-) {
-    let mut s = DefaultHasher::new();
-    salt.hash(&mut s);
-    "UseOn".hash(&mut s);
-    agent_id.hash(&mut s);
-    tool_id.hash(&mut s);
-    target_id.hash(&mut s);
-    //movement.hash(&mut s);
-    let prayer_id = s.finish();
-
-    let request = UseOnRequest {
-        agent_id,
-        prayer_id,
-        tool_id,
-        target_id,
-    };
-
-    commands.send_event(request);
-
-    *made_world_query = true;
-    *state = AgentState::WaitForAction(prayer_id);
 }
