@@ -35,9 +35,21 @@ mod game_state;
 pub use game_state::GameState;
 pub mod systems;
 use systems::{
-    actions::{eat_class_system, use_on_system, EatClassRequest, TakeRequest}, agent_system, cache_inventory_system, change_request::change_systems::{despawn_request_system, energy_request_system, hp_request_system, location_request_system, spawn_location_type_request_system}, query::{
-        find_in_inventory_system, find_nearest_system, get_energy_system, get_entities_system, get_hp_system, get_is_inventory_ge_system, get_location_system, FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult, GetEnergyRequest, GetEnergyResult, GetEntitiesRequest, GetEntitiesResult, GetHpRequest, GetHpResult, GetIsInventoryGERequest, GetIsInventoryGEResult, GetLocationRequest, GetLocationResult
-    }, receive_prayers_system, salt_system, Salt
+    SaltShaker,
+    actions::{EatClassRequest, TakeRequest, eat_class_system, use_on_system},
+    agent_system, cache_inventory_system,
+    change_request::change_systems::{
+        despawn_request_system, energy_request_system, hp_request_system, location_request_system,
+        spawn_location_type_request_system,
+    },
+    query::{
+        FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult,
+        GetEnergyRequest, GetEnergyResult, GetEntitiesRequest, GetEntitiesResult, GetHpRequest,
+        GetHpResult, GetIsInventoryGERequest, GetIsInventoryGEResult, GetLocationRequest,
+        GetLocationResult, find_in_inventory_system, find_nearest_system, get_energy_system,
+        get_entities_system, get_hp_system, get_is_inventory_ge_system, get_location_system,
+    },
+    receive_prayers_system, salt_system,
 };
 mod pawn_spawn;
 use pawn_spawn::pawn_spawn;
@@ -54,7 +66,7 @@ fn main() {
         .init_state::<GameState>()
         .add_plugins(DefaultPlugins)
         .insert_resource(systems::BVH(None))
-        .insert_resource(Salt(0))
+        .insert_resource(SaltShaker(0))
         .insert_resource(ui::UIState {
             selected_entity: None,
             mode: ui::Mode::Pan,

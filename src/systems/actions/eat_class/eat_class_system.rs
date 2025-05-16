@@ -10,6 +10,7 @@ use qol::placeholder;
 use ethnolib::sandbox::{Item, world::Type};
 
 use crate::systems::{
+    Salt,
     actions::{ActionResult, EatClassRequest, Result},
     cache::CacheInventory,
     change_request::{ChangeRequest, Changes},
@@ -22,7 +23,7 @@ pub fn eat_class_system(
     //mut posible_actions_responce: EventWriter<PosibleActionsResponce>,
     mut commands: Commands,
 ) {
-    let salt = 0;
+    let salt: Salt = 0;
 
     'outer: for EatClassRequest {
         agent_id,

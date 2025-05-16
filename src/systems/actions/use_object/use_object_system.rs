@@ -12,6 +12,7 @@ use ethnolib::{
 };
 
 use crate::systems::{
+    Salt,
     actions::use_object::{UseRequest, use_object},
     change_request::ChangeRequest,
     posible_actions::{PosibleActionsRequest, PosibleActionsResponce},
@@ -25,7 +26,7 @@ pub fn use_object_system(
     mut commands: Commands,
 ) {
     logy!("trace-use-object", "entering use_object_syetem");
-    let salt = 0;
+    let salt: Salt = 0;
     for UseRequest {
         agent_id,
         prayer_id,

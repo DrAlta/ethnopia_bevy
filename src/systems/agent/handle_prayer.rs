@@ -1,4 +1,5 @@
 use crate::systems::{
+    Salt,
     actions::{DropRequest, GotoRequest, TakeRequest, UseOnRequest, UseRequest},
     agent::AgentState,
     query::{
@@ -11,6 +12,7 @@ use bevy::prelude::*;
 use ethnolib::{
     Number,
     sandbox::{
+        EntityId,
         ai::{CPU, StackItem, Status, ThreadName},
         world::Movement,
     },
@@ -46,7 +48,7 @@ pub fn handle_prayer(
     state: &mut AgentState,
     commands: &mut Commands,
 ) -> () {
-    let salt = 0;
+    let salt: Salt = 0;
     match ok {
         Status::Success => {
             cpu.stack = vec![StackItem::success()];
@@ -80,28 +82,15 @@ pub fn handle_prayer(
             *made_world_query = true;
             *state = AgentState::WaitForAction(prayer_id);
         }
-        Status::UseOn(tool_id, target_id) => {
-            let mut s = DefaultHasher::new();
-            salt.hash(&mut s);
-            "UseOn".hash(&mut s);
-            agent_id.hash(&mut s);
-            tool_id.hash(&mut s);
-            target_id.hash(&mut s);
-            //movement.hash(&mut s);
-            let prayer_id = s.finish();
-
-            let request = UseOnRequest {
-                agent_id,
-                prayer_id,
-                tool_id,
-                target_id,
-            };
-
-            commands.send_event(request);
-
-            *made_world_query = true;
-            *state = AgentState::WaitForAction(prayer_id);
-        }
+        Status::UseOn(tool_id, target_id) => use_on(
+            agent_id,
+            tool_id,
+            target_id,
+            made_world_query,
+            state,
+            salt,
+            commands,
+        ),
         Status::FindNearest { x, y, item_class } => {
             let mut s = DefaultHasher::new();
             salt.hash(&mut s);
@@ -287,35 +276,39 @@ pub fn handle_prayer(
             *state = AgentState::WaitForAction(prayer_id);
         }
         Status::Running(inpulse_id) => match inpulse_id {
-            ethnolib::sandbox::ai::InpulseId::Act1 |
-            ethnolib::sandbox::ai::InpulseId::Act2 |
-            ethnolib::sandbox::ai::InpulseId::Act3 => {
+            ethnolib::sandbox::ai::InpulseId::Act1
+            | ethnolib::sandbox::ai::InpulseId::Act2
+            | ethnolib::sandbox::ai::InpulseId::Act3 => {
                 logy!("warning", "got an prayer for {inpulse_id:?}");
-            },
+            }
             ethnolib::sandbox::ai::InpulseId::GoTo => {
-                if let Some(StackItem::Coord { x, y }) = cpu.stack.pop() {
-                    let movement = Movement {
-                        target: vec2(Into::<Number>::into(x), Into::<Number>::into(y)),
-                        speed: Number::FIVE,
-                    };
-                    let mut s = DefaultHasher::new();
-                    salt.hash(&mut s);
-                    "Goto".hash(&mut s);
-                    agent_id.hash(&mut s);
-                    movement.hash(&mut s);
-                    let prayer_id = s.finish();
-                    let request = GotoRequest {
-                        agent_id,
-                        prayer_id,
-                        movement,
-                    };
-
-                    commands.send_event(request);
-
+                let Some(StackItem::Coord { x, y }) = cpu.stack.pop() else {
+                    cpu.stack.push(StackItem::failure());
 
                     *made_world_query = true;
-                    *state = AgentState::WaitForAction(prayer_id);
-                }
+                    *state = AgentState::Running;
+                    return;
+                };
+                let movement = Movement {
+                    target: vec2(Into::<Number>::into(x), Into::<Number>::into(y)),
+                    speed: Number::FIVE,
+                };
+                let mut s = DefaultHasher::new();
+                salt.hash(&mut s);
+                "Goto".hash(&mut s);
+                agent_id.hash(&mut s);
+                movement.hash(&mut s);
+                let prayer_id = s.finish();
+                let request = GotoRequest {
+                    agent_id,
+                    prayer_id,
+                    movement,
+                };
+
+                commands.send_event(request);
+
+                *made_world_query = true;
+                *state = AgentState::WaitForAction(prayer_id);
             }
             ethnolib::sandbox::ai::InpulseId::Plant => {
                 let Some(StackItem::EntityId(object_id)) = cpu.stack.pop() else {
@@ -339,7 +332,6 @@ pub fn handle_prayer(
                 };
 
                 commands.send_event(request);
-
 
                 *made_world_query = true;
                 *state = AgentState::WaitForAction(prayer_id);
@@ -367,33 +359,93 @@ pub fn handle_prayer(
 
                 commands.send_event(request);
 
+                *made_world_query = true;
+                *state = AgentState::WaitForAction(prayer_id);
+            }
+            ethnolib::sandbox::ai::InpulseId::Use => {
+                let Some(StackItem::EntityId(target_id)) = cpu.stack.pop() else {
+                    cpu.stack.push(StackItem::failure());
+
+                    *made_world_query = true;
+                    *state = AgentState::Running;
+                    return;
+                };
+                let mut s = DefaultHasher::new();
+                salt.hash(&mut s);
+                "Use".hash(&mut s);
+                agent_id.hash(&mut s);
+                target_id.hash(&mut s);
+                let prayer_id = s.finish();
+                let request = UseRequest {
+                    agent_id,
+                    prayer_id,
+                    target_id,
+                };
+
+                commands.send_event(request);
 
                 *made_world_query = true;
                 *state = AgentState::WaitForAction(prayer_id);
-            },
-            ethnolib::sandbox::ai::InpulseId::Use => {
-                if let Some(StackItem::EntityId(target_id)) = cpu.stack.pop() {
-                    let mut s = DefaultHasher::new();
-                    salt.hash(&mut s);
-                    "Use".hash(&mut s);
-                    agent_id.hash(&mut s);
-                    target_id.hash(&mut s);
-                    let prayer_id = s.finish();
-                    let request = UseRequest {
-                        agent_id,
-                        prayer_id,
-                        target_id,
-                    };
-
-                    commands.send_event(request);
+            }
+            ethnolib::sandbox::ai::InpulseId::UseOn => {
+                let Some(StackItem::EntityId(target_id)) = cpu.stack.pop() else {
+                    cpu.stack.push(StackItem::failure());
 
                     *made_world_query = true;
-                    *state = AgentState::WaitForAction(prayer_id);
-                }
+                    *state = AgentState::Running;
+                    return;
+                };
+                let Some(StackItem::EntityId(tool_id)) = cpu.stack.pop() else {
+                    cpu.stack.push(StackItem::failure());
+
+                    *made_world_query = true;
+                    *state = AgentState::Running;
+                    return;
+                };
+
+                use_on(
+                    agent_id,
+                    tool_id,
+                    target_id,
+                    made_world_query,
+                    state,
+                    salt,
+                    commands,
+                );
             }
-            ethnolib::sandbox::ai::InpulseId::UseOn => todo!(),
             ethnolib::sandbox::ai::InpulseId::EatClass(_food_class) => {}
         },
         Status::None => (),
     }
+}
+
+fn use_on(
+    agent_id: EntityId,
+    tool_id: EntityId,
+    target_id: EntityId,
+    made_world_query: &mut bool,
+    state: &mut AgentState,
+    salt: Salt,
+    commands: &mut Commands,
+) {
+    let mut s = DefaultHasher::new();
+    salt.hash(&mut s);
+    "UseOn".hash(&mut s);
+    agent_id.hash(&mut s);
+    tool_id.hash(&mut s);
+    target_id.hash(&mut s);
+    //movement.hash(&mut s);
+    let prayer_id = s.finish();
+
+    let request = UseOnRequest {
+        agent_id,
+        prayer_id,
+        tool_id,
+        target_id,
+    };
+
+    commands.send_event(request);
+
+    *made_world_query = true;
+    *state = AgentState::WaitForAction(prayer_id);
 }

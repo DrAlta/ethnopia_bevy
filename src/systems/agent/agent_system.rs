@@ -1,4 +1,5 @@
 use crate::{
+    GameState,
     systems::{
         agent::{Agent, AgentState},
         query::{
@@ -6,7 +7,7 @@ use crate::{
             GetHpRequest, GetIsInventoryGERequest, GetLocationRequest,
             RemoveEntitiesOfClassRequest, RetainEntitiesOfClassRequest,
         },
-    }, GameState
+    },
 };
 use bevy::prelude::*;
 
@@ -14,13 +15,13 @@ use super::handle_prayer;
 
 pub fn agent_system(
     mut query: Query<(Entity, &mut Agent)>,
-/*
-    mut drop_request: EventWriter<DropRequest>,
-    mut goto_request: EventWriter<GotoRequest>,
-    mut take_request: EventWriter<TakeRequest>,
-    mut use_request: EventWriter<UseRequest>,
-    mut use_on_request: EventWriter<UseOnRequest>,
-*/
+    /*
+        mut drop_request: EventWriter<DropRequest>,
+        mut goto_request: EventWriter<GotoRequest>,
+        mut take_request: EventWriter<TakeRequest>,
+        mut use_request: EventWriter<UseRequest>,
+        mut use_on_request: EventWriter<UseOnRequest>,
+    */
     mut find_in_inventory_request: EventWriter<FindInInventoryRequest>,
     mut find_nearest_request: EventWriter<FindNearestRequest>,
     mut get_energy_request: EventWriter<GetEnergyRequest>,
@@ -30,7 +31,6 @@ pub fn agent_system(
     mut get_location_request: EventWriter<GetLocationRequest>,
     mut remove_entities_of_class_request: EventWriter<RemoveEntitiesOfClassRequest>,
     mut retain_entities_of_class_request: EventWriter<RetainEntitiesOfClassRequest>,
-
 
     state: Res<State<GameState>>,
     mut next_state: ResMut<NextState<GameState>>,

@@ -9,6 +9,7 @@ use ethnolib::sandbox::{
 };
 
 use crate::systems::{
+    Salt,
     actions::use_on::{UseOnRequest, use_on},
     change_request::ChangeRequest,
 };
@@ -21,7 +22,7 @@ pub fn use_on_system(
     mut commands: Commands,
 ) {
     logy!("trace-use-on", "entering use_on_syetem");
-    let salt = 0;
+    let salt: Salt = 0;
     for UseOnRequest {
         agent_id,
         prayer_id,

@@ -10,4 +10,4 @@ pub mod movement;
 pub mod posible_actions;
 pub mod query;
 mod salt;
-pub use salt::{Salt, salt_system};
+pub use salt::{Salt, SaltShaker, salt_system};
