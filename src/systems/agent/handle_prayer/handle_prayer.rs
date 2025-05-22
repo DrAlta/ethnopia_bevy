@@ -51,6 +51,7 @@ pub fn handle_prayer(
     commands: &mut Commands,
 ) -> () {
     let salt: Salt = 0;
+    logy!("debug", "{ok:?}");
     match ok {
         Status::Success => {
             cpu.stack = vec![StackItem::success()];

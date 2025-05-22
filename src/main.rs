@@ -10,11 +10,7 @@ use bevy::{
 };
 use ethnolib::{
     Number,
-    sandbox::{
-        Item, Location,
-        movement::Collision,
-        world::{Energy, Hp, Size, Type},
-    },
+    sandbox::{Item, movement::Collision},
 };
 
 use crate::systems::{
@@ -33,6 +29,8 @@ mod dev_console;
 use dev_console::collision_report_system;
 mod game_state;
 pub use game_state::GameState;
+mod setup;
+use setup::setup;
 pub mod systems;
 use systems::{
     SaltShaker,
@@ -46,8 +44,10 @@ use systems::{
         FindInInventoryRequest, FindInInventoryResult, FindNearestRequest, FindNearestResult,
         GetEnergyRequest, GetEnergyResult, GetEntitiesRequest, GetEntitiesResult, GetHpRequest,
         GetHpResult, GetIsInventoryGERequest, GetIsInventoryGEResult, GetLocationRequest,
-        GetLocationResult, find_in_inventory_system, find_nearest_system, get_energy_system,
-        get_entities_system, get_hp_system, get_is_inventory_ge_system, get_location_system,
+        GetLocationResult, RemoveEntitiesOfClassRequest, RemoveEntitiesOfClassResult,
+        RetainEntitiesOfClassRequest, RetainEntitiesOfClassResult, find_in_inventory_system,
+        find_nearest_system, get_energy_system, get_entities_system, get_hp_system,
+        get_is_inventory_ge_system, get_location_system,
     },
     receive_prayers_system, salt_system,
 };
@@ -63,8 +63,8 @@ const CELL_SIZE: Number = Number::new(30, 1);
 
 fn main() {
     App::new()
-        .init_state::<GameState>()
         .add_plugins(DefaultPlugins)
+        .init_state::<GameState>()
         .insert_resource(systems::BVH(None))
         .insert_resource(SaltShaker(0))
         .insert_resource(ui::UIState {
@@ -110,6 +110,10 @@ fn main() {
         .add_event::<GetIsInventoryGEResult>()
         .add_event::<GetLocationRequest>()
         .add_event::<GetLocationResult>()
+        .add_event::<RemoveEntitiesOfClassRequest>()
+        .add_event::<RemoveEntitiesOfClassResult>()
+        .add_event::<RetainEntitiesOfClassRequest>()
+        .add_event::<RetainEntitiesOfClassResult>()
         // ui
         .add_event::<ui::UISelect>()
         .add_systems(
@@ -174,60 +178,6 @@ fn main() {
                 .chain(),
         )*/
         .run();
-}
-
-fn setup(mut commands: Commands) {
-    commands.spawn(Camera2d);
-    let agent_id = commands
-        .spawn((
-            Type(Item::Agent),
-            Location::World {
-                x: Number::ZERO,
-                y: Number::ZERO,
-            },
-            Size {
-                width: Into::<i32>::into(CELL_SIZE),
-                height: Into::<i32>::into(CELL_SIZE),
-            },
-            Hp(10),
-            Energy(10),
-            //    Movement{ target: Vec2{x: 200.0, y: 5.0}, speed: 5.0 }
-        ))
-        .id();
-    commands.spawn((Type(Item::Axe), Location::Inventory(agent_id), Size {
-        width: Into::<i32>::into(CELL_SIZE),
-        height: Into::<i32>::into(CELL_SIZE),
-    }));
-
-    commands.spawn((
-        Type(Item::Tree),
-        Location::World {
-            x: CELL_SIZE * 3.0,
-            y: Number::ZERO,
-        },
-        Size {
-            width: Into::<i32>::into(CELL_SIZE),
-            height: Into::<i32>::into(CELL_SIZE),
-        },
-    ));
-    commands.spawn((
-        Text2d::new("hello world!"),
-        Transform::from_xyz(0.0, 30.0, 0.0),
-    ));
-    /*
-        let mut world = World::from((
-            HashMap::from([
-                (0, ),
-                (1, Location::Inventory(0)),
-                (2, Location::World { x: 0.0, y: 19.0 }),
-            ]),
-
-            HashMap::from([
-                (0, (GRID_SIZE, GRID_SIZE)),
-                (2, (GRID_SIZE, GRID_SIZE)),
-            ]),
-            HashMap::from([(0, Item::Agent), (1, Item::Axe), (2, Item::Tree)]),
-    */
 }
 
 pub fn type_to_color(tyep: &Item) -> Color {

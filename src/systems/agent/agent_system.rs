@@ -10,6 +10,7 @@ use crate::{
     },
 };
 use bevy::prelude::*;
+use qol::logy;
 
 use super::handle_prayer;
 
@@ -42,10 +43,15 @@ pub fn agent_system(
         let Agent {
             cpu,
             blackboard,
-            bt,
+            task_pool: bt,
             state,
             main,
         } = agent.as_mut();
+        logy!("debug", "Stack is:");
+        for c in &cpu.stack {
+            println!("    {c:?}");
+        }
+
         match state {
             AgentState::Running => match cpu.step(bt, blackboard) {
                 Ok(ok) => {
@@ -75,7 +81,7 @@ pub fn agent_system(
                         &mut commands,
                     );
                 }
-                Err(_) => todo!(),
+                Err(err) => todo!("{err}"),
             },
             AgentState::WaitForAction(_prayer_id) => continue,
         }
